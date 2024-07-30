@@ -1,7 +1,58 @@
-type Burn @entity {
+type Vault @entity {
   id: ID!
-  block: Int!
+  owner: String! @index
+  createdAt: DateTime!
+  honeyVaultAddress: String! @index
+}
+
+type LPToken @entity {
+  id: ID!
   address: String! @index
-  value: BigInt!
-  txHash: String!
+  name: String
+  symbol: String
+}
+
+type VaultDeposit @entity {
+  id: ID!
+  vault: Vault!
+  token: LPToken!
+  amount: BigInt!
+  timestamp: DateTime!
+  lockExpiration: DateTime
+}
+
+type VaultStake @entity {
+  id: ID!
+  vault: Vault!
+  token: LPToken!
+  stakingContract: String! @index
+  amount: BigInt!
+  timestamp: DateTime!
+}
+
+type VaultUnstake @entity {
+  id: ID!
+  vault: Vault!
+  token: LPToken!
+  stakingContract: String! @index
+  amount: BigInt!
+  timestamp: DateTime!
+}
+
+type BGTBoost @entity {
+  id: ID!
+  vault: Vault!
+  validator: String! @index
+  amount: BigInt!
+  status: String! # "Queued" or "Activated"
+  timestamp: DateTime!
+}
+
+type KodiakStake @entity {
+  id: ID!
+  vault: Vault!
+  amount: BigInt!
+  lockDuration: Int!
+  kekId: String! @index
+  timestamp: DateTime!
 }

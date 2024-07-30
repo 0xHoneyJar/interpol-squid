@@ -1,0 +1,41 @@
+[
+  {
+    "type": "constructor",
+    "inputs": [
+      { "name": "_honeyQueen", "type": "address", "internalType": "address" }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "clone",
+    "inputs": [
+      { "name": "_owner", "type": "address", "internalType": "address" },
+      { "name": "_referral", "type": "address", "internalType": "address" },
+      { "name": "_unlocked", "type": "bool", "internalType": "bool" }
+    ],
+    "outputs": [
+      { "name": "", "type": "address", "internalType": "contract HoneyVault" }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "event",
+    "name": "NewVault",
+    "inputs": [
+      {
+        "name": "owner",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "vault",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
+      }
+    ],
+    "anonymous": false
+  }
+]
