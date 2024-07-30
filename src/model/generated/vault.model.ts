@@ -18,5 +18,5 @@ export class Vault {
 
     @Index_()
     @StringColumn_({nullable: false})
-    honeyVaultAddress!: string
+    address!: string
 }

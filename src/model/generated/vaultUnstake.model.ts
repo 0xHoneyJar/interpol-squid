@@ -1,6 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, ManyToOne as ManyToOne_, Index as Index_, StringColumn as StringColumn_, BigIntColumn as BigIntColumn_, DateTimeColumn as DateTimeColumn_} from "@subsquid/typeorm-store"
-import {Vault} from "./vault.model"
-import {LPToken} from "./lpToken.model"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, StringColumn as StringColumn_, Index as Index_, BigIntColumn as BigIntColumn_, DateTimeColumn as DateTimeColumn_} from "@subsquid/typeorm-store"
 
 @Entity_()
 export class VaultUnstake {
@@ -12,12 +10,11 @@ export class VaultUnstake {
     id!: string
 
     @Index_()
-    @ManyToOne_(() => Vault, {nullable: true})
-    vault!: Vault
+    @StringColumn_({nullable: false})
+    vaultAddress!: string
 
-    @Index_()
-    @ManyToOne_(() => LPToken, {nullable: true})
-    token!: LPToken
+    @StringColumn_({nullable: false})
+    tokenAddress!: string
 
     @Index_()
     @StringColumn_({nullable: false})

@@ -32,7 +32,7 @@ processor.run(new TypeormDatabase(), async (ctx) => {
             id: vault,
             owner: owner,
             createdAt: new Date(block.header.timestamp),
-            honeyVaultAddress: vault,
+            address: vault,
           })
         );
       }
@@ -46,8 +46,8 @@ processor.run(new TypeormDatabase(), async (ctx) => {
         vaultDeposits.push(
           new VaultDeposit({
             id: log.id,
-            vault: log.address,
-            token: token,
+            vaultAddress: log.address,
+            tokenAddress: token,
             amount: amount,
             timestamp: new Date(block.header.timestamp),
           })
@@ -64,8 +64,8 @@ processor.run(new TypeormDatabase(), async (ctx) => {
         vaultStakes.push(
           new VaultStake({
             id: log.id,
-            vault: log.address,
-            token: token,
+            vaultAddress: log.address,
+            tokenAddress: token,
             stakingContract: stakingContract,
             amount: amount,
             timestamp: new Date(block.header.timestamp),
@@ -79,58 +79,21 @@ processor.run(new TypeormDatabase(), async (ctx) => {
         vaultUnstakes.push(
           new VaultUnstake({
             id: log.id,
-            vault: log.address,
-            token: token,
+            vaultAddress: log.address,
+            tokenAddress: token,
             stakingContract: stakingContract,
             amount: amount,
             timestamp: new Date(block.header.timestamp),
           })
         );
       }
-
-      // if (
-      //   log.topics[0] === bgtAbi.events.QueueBoost.topic ||
-      //   log.topics[0] === bgtAbi.events.ActivateBoost.topic
-      // ) {
-      //   const { sender, validator, amount } =
-      //     bgtAbi.events.QueueBoost.decode(log);
-      //   bgtBoosts.push(
-      //     new BGTBoost({
-      //       id: log.id,
-      //       vault: sender,
-      //       validator: validator,
-      //       amount: amount,
-      //       status:
-      //         log.topics[0] === bgtAbi.events.QueueBoost.topic
-      //           ? "Queued"
-      //           : "Activated",
-      //       timestamp: new Date(block.header.timestamp),
-      //     })
-      //   );
-      }
-
-      //   if (log.topics[0] === kodiakAbi.events.StakeLocked.topic) {
-      //     const { user, amount, secs, kek_id } =
-      //       kodiakAbi.events.StakeLocked.decode(log);
-      //     kodiakStakes.push(
-      //       new KodiakStake({
-      //         id: log.id,
-      //         vault: user,
-      //         amount: amount,
-      //         lockDuration: secs,
-      //         kekId: kek_id,
-      //         timestamp: new Date(block.header.timestamp),
-      //       })
-      //     );
-      //   }
     }
+    await ctx.store.save(vaults);
+    await ctx.store.save(lpTokens);
+    await ctx.store.save(vaultDeposits);
+    await ctx.store.save(vaultStakes);
+    await ctx.store.save(vaultUnstakes);
+    await ctx.store.save(bgtBoosts);
+    await ctx.store.save(kodiakStakes);
   }
-
-  await ctx.store.save(vaults);
-  await ctx.store.save(lpTokens);
-  await ctx.store.save(vaultDeposits);
-  await ctx.store.save(vaultStakes);
-  await ctx.store.save(vaultUnstakes);
-  await ctx.store.save(bgtBoosts);
-  await ctx.store.save(kodiakStakes);
 });

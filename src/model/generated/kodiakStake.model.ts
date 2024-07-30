@@ -1,5 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, ManyToOne as ManyToOne_, Index as Index_, BigIntColumn as BigIntColumn_, IntColumn as IntColumn_, StringColumn as StringColumn_, DateTimeColumn as DateTimeColumn_} from "@subsquid/typeorm-store"
-import {Vault} from "./vault.model"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, StringColumn as StringColumn_, Index as Index_, BigIntColumn as BigIntColumn_, IntColumn as IntColumn_, DateTimeColumn as DateTimeColumn_} from "@subsquid/typeorm-store"
 
 @Entity_()
 export class KodiakStake {
@@ -11,8 +10,8 @@ export class KodiakStake {
     id!: string
 
     @Index_()
-    @ManyToOne_(() => Vault, {nullable: true})
-    vault!: Vault
+    @StringColumn_({nullable: false})
+    vaultAddress!: string
 
     @BigIntColumn_({nullable: false})
     amount!: bigint

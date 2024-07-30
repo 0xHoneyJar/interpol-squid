@@ -2,7 +2,7 @@ type Vault @entity {
   id: ID!
   owner: String! @index
   createdAt: DateTime!
-  honeyVaultAddress: String! @index
+  address: String! @index
 }
 
 type LPToken @entity {
@@ -14,8 +14,8 @@ type LPToken @entity {
 
 type VaultDeposit @entity {
   id: ID!
-  vault: Vault!
-  token: LPToken!
+  vaultAddress: String! @index
+  tokenAddress: String!
   amount: BigInt!
   timestamp: DateTime!
   lockExpiration: DateTime
@@ -23,8 +23,8 @@ type VaultDeposit @entity {
 
 type VaultStake @entity {
   id: ID!
-  vault: Vault!
-  token: LPToken!
+  vaultAddress: String! @index
+  tokenAddress: String!
   stakingContract: String! @index
   amount: BigInt!
   timestamp: DateTime!
@@ -32,8 +32,8 @@ type VaultStake @entity {
 
 type VaultUnstake @entity {
   id: ID!
-  vault: Vault!
-  token: LPToken!
+  vaultAddress: String! @index
+  tokenAddress: String!
   stakingContract: String! @index
   amount: BigInt!
   timestamp: DateTime!
@@ -41,7 +41,7 @@ type VaultUnstake @entity {
 
 type BGTBoost @entity {
   id: ID!
-  vault: Vault!
+  vaultAddress: String! @index
   validator: String! @index
   amount: BigInt!
   status: String! # "Queued" or "Activated"
@@ -50,7 +50,7 @@ type BGTBoost @entity {
 
 type KodiakStake @entity {
   id: ID!
-  vault: Vault!
+  vaultAddress: String! @index
   amount: BigInt!
   lockDuration: Int!
   kekId: String! @index
