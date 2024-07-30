@@ -21,6 +21,14 @@ type VaultDeposit @entity {
   lockExpiration: DateTime
 }
 
+type VaultTotalDeposit @entity {
+  id: ID!
+  vaultAddress: String! @index
+  tokenAddress: String!
+  amount: BigInt!
+  lockExpiration: DateTime
+}
+
 type VaultStake @entity {
   id: ID!
   vaultAddress: String! @index
@@ -37,6 +45,14 @@ type VaultUnstake @entity {
   stakingContract: String! @index
   amount: BigInt!
   timestamp: DateTime!
+}
+
+type VaultTotalStake @entity {
+  id: ID!
+  vaultAddress: String! @index
+  tokenAddress: String!
+  stakingContract: String! @index
+  amount: BigInt!
 }
 
 type BGTBoost @entity {
