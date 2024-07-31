@@ -1,6 +1,6 @@
 manifestVersion: subsquid.io/v0.1
 name: interpol-squid
-version: 1
+version: 2
 description: "Interpol Squid"
 build:
 deploy:
@@ -11,12 +11,8 @@ deploy:
     # rpc:
     #   - eth.http
   processor:
-    cmd:
-      - sqd
-      - process:prod
+    cmd: ["sqd", "process:prod"]
   api:
-    cmd:
-      - sqd
-      - serve:prod
+    cmd: ["sqd", "serve:prod"]
 scale:
   dedicated: true
