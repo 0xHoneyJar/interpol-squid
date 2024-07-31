@@ -1,4 +1,3 @@
-import { assertNotNull } from "@subsquid/util-internal";
 import {
   BlockHeader,
   DataHandlerContext,
@@ -7,16 +6,17 @@ import {
   Log as _Log,
   Transaction as _Transaction,
 } from "@subsquid/evm-processor";
+import { assertNotNull } from "@subsquid/util-internal";
+import * as bgtAbi from "./abi/BGT"; // You'll need to add this ABI
 import * as factoryAbi from "./abi/Factory";
 import * as honeyVaultAbi from "./abi/HoneyVault";
-import * as bgtAbi from "./abi/BGT"; // You'll need to add this ABI
 //import * as kodiakAbi from "./abi/Kodiak"; // You'll need to add this ABI
-import { FACTORY_ADDRESS, HONEYQUEEN_ADDRESS, BGT_ADDRESS } from "./addresses";
+import { BGT_ADDRESS, FACTORY_ADDRESS } from "./addresses";
 
 export const processor = new EvmBatchProcessor()
-  .setGateway("https://v2.archive.subsquid.io/network/ethereum-mainnet")
+  .setGateway("https://v2.archive.subsquid.io/network/berachain-bartio")
   .setRpcEndpoint({
-    url: assertNotNull(process.env.RPC_ETH_HTTP, "No RPC endpoint supplied"),
+    url: assertNotNull(process.env.RPC_BERA_HTTP, "No RPC endpoint supplied"),
     rateLimit: 10,
   })
   .setFinalityConfirmation(75)

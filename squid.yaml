@@ -8,8 +8,8 @@ deploy:
     RPC_BERA_HTTP: ${{ secrets.RPC_BERA_HTTP }}
   addons:
     postgres:
-    rpc:
-      - eth.http
+    # rpc:
+    #   - eth.http
   processor:
     cmd:
       - sqd

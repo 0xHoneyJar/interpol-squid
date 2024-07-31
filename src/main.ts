@@ -1,5 +1,4 @@
 import { TypeormDatabase } from "@subsquid/typeorm-store";
-import * as bgtAbi from "./abi/BGT";
 import * as factoryAbi from "./abi/Factory";
 import * as honeyVaultAbi from "./abi/HoneyVault";
 import {
@@ -8,10 +7,10 @@ import {
   LPToken,
   Vault,
   VaultDeposit,
-  VaultTotalDeposit,
   VaultStake,
-  VaultUnstake,
+  VaultTotalDeposit,
   VaultTotalStake,
+  VaultUnstake,
 } from "./model";
 import { processor } from "./processor";
 // import * as kodiakAbi from './abi/Kodiak'
@@ -29,12 +28,10 @@ processor.run(new TypeormDatabase(), async (ctx) => {
 
   for (let block of ctx.blocks) {
     for (let log of block.logs) {
-      const logTopic = log.topics[0];
-
       /*###############################################################
                             NEW VAULT EVENT
       ###############################################################*/
-      if (logTopic === factoryAbi.events.NewVault.topic) {
+      if (factoryAbi.events.NewVault.is(log)) {
         const { owner, vault } = factoryAbi.events.NewVault.decode(log);
         vaults.push(
           new Vault({
@@ -49,7 +46,7 @@ processor.run(new TypeormDatabase(), async (ctx) => {
       /*###############################################################
                             DEPOSIT EVENT
       ###############################################################*/
-      if (logTopic === honeyVaultAbi.events.Deposited.topic) {
+      if (honeyVaultAbi.events.Deposited.is(log)) {
         const { token, amount } = honeyVaultAbi.events.Deposited.decode(log);
         // we add single deposit event
         vaultDeposits.push(
@@ -80,7 +77,7 @@ processor.run(new TypeormDatabase(), async (ctx) => {
       /*###############################################################
                             LOCK EVENT
       ###############################################################*/
-      if (logTopic === honeyVaultAbi.events.LockedUntil.topic) {
+      if (honeyVaultAbi.events.LockedUntil.is(log)) {
         const { token, expiration } =
           honeyVaultAbi.events.LockedUntil.decode(log);
 
@@ -95,7 +92,7 @@ processor.run(new TypeormDatabase(), async (ctx) => {
       /*###############################################################
                             STAKE EVENT
       ###############################################################*/
-      if (logTopic === honeyVaultAbi.events.Staked.topic) {
+      if (honeyVaultAbi.events.Staked.is(log)) {
         const vaultAddress = log.address;
         const { stakingContract, token, amount } =
           honeyVaultAbi.events.Staked.decode(log);
@@ -128,7 +125,7 @@ processor.run(new TypeormDatabase(), async (ctx) => {
       /*###############################################################
                             UNSTAKE EVENT
       ###############################################################*/
-      if (logTopic === honeyVaultAbi.events.Unstaked.topic) {
+      if (honeyVaultAbi.events.Unstaked.is(log)) {
         const { stakingContract, token, amount } =
           honeyVaultAbi.events.Unstaked.decode(log);
         vaultUnstakes.push(
