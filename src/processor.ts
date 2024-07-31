@@ -19,7 +19,7 @@ export const processor = new EvmBatchProcessor()
     url: assertNotNull(process.env.RPC_BERA_HTTP, "No RPC endpoint supplied"),
     // rateLimit: 10,
   })
-  .setFinalityConfirmation(75)
+  .setFinalityConfirmation(5)
   .setFields({
     transaction: {
       from: true,
@@ -28,7 +28,7 @@ export const processor = new EvmBatchProcessor()
     },
   })
   .setBlockRange({
-    from: 0,
+    from: 2068586, // deployment block of factory
   })
   .addLog({
     address: [FACTORY_ADDRESS], // Factory contract address
