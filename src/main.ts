@@ -24,7 +24,6 @@ processor.run(new TypeormDatabase(), async (ctx) => {
   const vaultUnstakes: VaultUnstake[] = [];
   const vaultTotalStakes: VaultTotalStake[] = [];
   const bgtBoosts: BGTBoost[] = [];
-  const kodiakStakes: KodiakStake[] = [];
 
   for (let block of ctx.blocks) {
     for (let log of block.logs) {
@@ -154,9 +153,10 @@ processor.run(new TypeormDatabase(), async (ctx) => {
     await ctx.store.upsert(vaults);
     await ctx.store.upsert(lpTokens);
     await ctx.store.upsert(vaultDeposits);
+    await ctx.store.upsert(vaultTotalDeposits);
     await ctx.store.upsert(vaultStakes);
     await ctx.store.upsert(vaultUnstakes);
     await ctx.store.upsert(bgtBoosts);
-    await ctx.store.upsert(kodiakStakes);
+    await ctx.store.upsert(vaultTotalStakes);
   }
 });

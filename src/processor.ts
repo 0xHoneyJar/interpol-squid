@@ -17,6 +17,7 @@ export const processor = new EvmBatchProcessor()
   .setGateway("https://v2.archive.subsquid.io/network/berachain-bartio")
   .setRpcEndpoint({
     url: assertNotNull(process.env.RPC_BERA_HTTP, "No RPC endpoint supplied"),
+    maxBatchCallSize: 10000,
     // rateLimit: 10,
   })
   .setFinalityConfirmation(5)
@@ -28,7 +29,7 @@ export const processor = new EvmBatchProcessor()
     },
   })
   .setBlockRange({
-    from: 2068586, // deployment block of factory
+    from: 2209030, // deployment block of factory
   })
   .addLog({
     address: [FACTORY_ADDRESS], // Factory contract address
