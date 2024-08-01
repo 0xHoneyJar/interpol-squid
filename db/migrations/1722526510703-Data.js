@@ -1,12 +1,10 @@
-module.exports = class Data1722407992695 {
-    name = 'Data1722407992695'
+module.exports = class Data1722526510703 {
+    name = 'Data1722526510703'
 
     async up(db) {
-        await db.query(`CREATE TABLE "vault" ("id" character varying NOT NULL, "owner" text NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL, "address" text NOT NULL, CONSTRAINT "PK_dd0898234c77f9d97585171ac59" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "vault" ("id" character varying NOT NULL, "owner" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "address" text NOT NULL, CONSTRAINT "PK_dd0898234c77f9d97585171ac59" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_fcb1371031401437ab3fe5db8a" ON "vault" ("owner") `)
-        await db.query(`CREATE INDEX "IDX_35a94164f935280cf7fe9b1347" ON "vault" ("address") `)
         await db.query(`CREATE TABLE "lp_token" ("id" character varying NOT NULL, "address" text NOT NULL, "name" text, "symbol" text, CONSTRAINT "PK_3737dbc5233b14a02a3756d2597" PRIMARY KEY ("id"))`)
-        await db.query(`CREATE INDEX "IDX_94f721d7dc18268e6b5c00a4bd" ON "lp_token" ("address") `)
         await db.query(`CREATE TABLE "vault_deposit" ("id" character varying NOT NULL, "vault_address" text NOT NULL, "token_address" text NOT NULL, "amount" numeric NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "lock_expiration" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_eb436a184ae6cfb4f8f1ae05994" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_a12684c8c172fa0a93d15559bc" ON "vault_deposit" ("vault_address") `)
         await db.query(`CREATE TABLE "vault_total_deposit" ("id" character varying NOT NULL, "vault_address" text NOT NULL, "token_address" text NOT NULL, "amount" numeric NOT NULL, "lock_expiration" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_1488bb6646f12fc65dcc4ec7300" PRIMARY KEY ("id"))`)
@@ -31,9 +29,7 @@ module.exports = class Data1722407992695 {
     async down(db) {
         await db.query(`DROP TABLE "vault"`)
         await db.query(`DROP INDEX "public"."IDX_fcb1371031401437ab3fe5db8a"`)
-        await db.query(`DROP INDEX "public"."IDX_35a94164f935280cf7fe9b1347"`)
         await db.query(`DROP TABLE "lp_token"`)
-        await db.query(`DROP INDEX "public"."IDX_94f721d7dc18268e6b5c00a4bd"`)
         await db.query(`DROP TABLE "vault_deposit"`)
         await db.query(`DROP INDEX "public"."IDX_a12684c8c172fa0a93d15559bc"`)
         await db.query(`DROP TABLE "vault_total_deposit"`)

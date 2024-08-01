@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, StringColumn as StringColumn_, Index as Index_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, StringColumn as StringColumn_} from "@subsquid/typeorm-store"
 
 @Entity_()
 export class LPToken {
@@ -9,7 +9,6 @@ export class LPToken {
     @PrimaryColumn_()
     id!: string
 
-    @Index_()
     @StringColumn_({nullable: false})
     address!: string
 

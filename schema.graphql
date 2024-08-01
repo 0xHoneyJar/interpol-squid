@@ -1,13 +1,13 @@
 type Vault @entity {
   id: ID!
   owner: String! @index
-  createdAt: DateTime!
-  address: String! @index
+  timestamp: DateTime!
+  address: String!
 }
 
 type LPToken @entity {
   id: ID!
-  address: String! @index
+  address: String!
   name: String
   symbol: String
 }
@@ -19,6 +19,16 @@ type VaultDeposit @entity {
   amount: BigInt!
   timestamp: DateTime!
   lockExpiration: DateTime
+  transactionHash: String!
+}
+
+type VaultWithdrawal @entity {
+  id: ID!
+  vaultAddress: String! @index
+  tokenAddress: String!
+  amount: BigInt!
+  timestamp: DateTime!
+  transactionHash: String!
 }
 
 type VaultTotalDeposit @entity {
@@ -36,6 +46,7 @@ type VaultStake @entity {
   stakingContract: String! @index
   amount: BigInt!
   timestamp: DateTime!
+  transactionHash: String!
 }
 
 type VaultUnstake @entity {
@@ -45,6 +56,7 @@ type VaultUnstake @entity {
   stakingContract: String! @index
   amount: BigInt!
   timestamp: DateTime!
+  transactionHash: String!
 }
 
 type VaultTotalStake @entity {

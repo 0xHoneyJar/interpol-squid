@@ -14,9 +14,8 @@ export class Vault {
     owner!: string
 
     @DateTimeColumn_({nullable: false})
-    createdAt!: Date
+    timestamp!: Date
 
-    @Index_()
     @StringColumn_({nullable: false})
     address!: string
 }

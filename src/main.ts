@@ -19,7 +19,7 @@ processor.run(new TypeormDatabase(), async (ctx) => {
   const vaults: Vault[] = [];
   const lpTokens: LPToken[] = [];
   const vaultDeposits: VaultDeposit[] = [];
-  const vaultTotalDeposits: VaultTotalDeposit[] = [];
+  const vaultTotalDepositsMap = new Map<string, VaultTotalDeposit>();
   const vaultStakes: VaultStake[] = [];
   const vaultUnstakes: VaultUnstake[] = [];
   const vaultTotalStakes: VaultTotalStake[] = [];
@@ -34,9 +34,9 @@ processor.run(new TypeormDatabase(), async (ctx) => {
         const { owner, vault } = factoryAbi.events.NewVault.decode(log);
         vaults.push(
           new Vault({
-            id: vault,
+            id: log.id,
             owner: owner,
-            createdAt: new Date(block.header.timestamp),
+            timestamp: new Date(block.header.timestamp),
             address: vault,
           })
         );
@@ -59,18 +59,18 @@ processor.run(new TypeormDatabase(), async (ctx) => {
         );
 
         // We also update the single entity that tracks the total deposit amount for each vault for each LP token
-        const vaultTotalDeposit = await ctx.store.get(
-          VaultTotalDeposit,
-          log.address + "-" + token
-        );
-        vaultTotalDeposits.push(
-          new VaultTotalDeposit({
-            id: log.address + "-" + token,
-            vaultAddress: log.address,
-            tokenAddress: token,
-            amount: amount + (vaultTotalDeposit?.amount || BigInt(0)),
-          })
-        );
+        const id = log.address + "-" + token;
+        const existingDeposit =
+          vaultTotalDepositsMap.get(id) ||
+          (await ctx.store.get(VaultTotalDeposit, id));
+        const updatedDeposit = new VaultTotalDeposit({
+          id: id,
+          vaultAddress: log.address,
+          tokenAddress: token,
+          amount: amount + (existingDeposit?.amount || BigInt(0)),
+          lockExpiration: existingDeposit?.lockExpiration,
+        });
+        vaultTotalDepositsMap.set(id, updatedDeposit);
       }
 
       /*###############################################################
@@ -79,13 +79,16 @@ processor.run(new TypeormDatabase(), async (ctx) => {
       if (honeyVaultAbi.events.LockedUntil.is(log)) {
         const { token, expiration } =
           honeyVaultAbi.events.LockedUntil.decode(log);
-
-        vaultTotalDeposits.push(
-          new VaultTotalDeposit({
-            id: log.address + "-" + token,
-            lockExpiration: new Date(Number(expiration)),
-          })
-        );
+        const id = log.address + "-" + token;
+        const existingDeposit =
+          vaultTotalDepositsMap.get(id) ||
+          (await ctx.store.get(VaultTotalDeposit, id));
+        const updatedDeposit = new VaultTotalDeposit({
+          ...existingDeposit,
+          id: id,
+          lockExpiration: new Date(Number(expiration)),
+        });
+        vaultTotalDepositsMap.set(id, updatedDeposit);
       }
 
       /*###############################################################
@@ -150,13 +153,13 @@ processor.run(new TypeormDatabase(), async (ctx) => {
         );
       }
     }
-    await ctx.store.upsert(vaults);
-    await ctx.store.upsert(lpTokens);
-    await ctx.store.upsert(vaultDeposits);
-    await ctx.store.upsert(vaultTotalDeposits);
-    await ctx.store.upsert(vaultStakes);
-    await ctx.store.upsert(vaultUnstakes);
-    await ctx.store.upsert(bgtBoosts);
-    await ctx.store.upsert(vaultTotalStakes);
   }
+  await ctx.store.upsert(vaults);
+  await ctx.store.upsert(lpTokens);
+  await ctx.store.upsert(vaultDeposits);
+  await ctx.store.upsert(Array.from(vaultTotalDepositsMap.values()));
+  await ctx.store.upsert(vaultStakes);
+  await ctx.store.upsert(vaultUnstakes);
+  await ctx.store.upsert(bgtBoosts);
+  await ctx.store.upsert(vaultTotalStakes);
 });
