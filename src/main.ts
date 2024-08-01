@@ -55,6 +55,7 @@ processor.run(new TypeormDatabase(), async (ctx) => {
             tokenAddress: token,
             amount: amount,
             timestamp: new Date(block.header.timestamp),
+            transactionHash: log.transaction?.hash,
           })
         );
 
@@ -106,6 +107,7 @@ processor.run(new TypeormDatabase(), async (ctx) => {
             stakingContract,
             amount,
             timestamp: new Date(block.header.timestamp),
+            transactionHash: log.transaction?.hash,
           })
         );
 
@@ -138,6 +140,7 @@ processor.run(new TypeormDatabase(), async (ctx) => {
             stakingContract,
             amount,
             timestamp: new Date(block.header.timestamp),
+            transactionHash: log.transaction?.hash,
           })
         );
 

@@ -24,4 +24,7 @@ export class VaultDeposit {
 
     @DateTimeColumn_({nullable: true})
     lockExpiration!: Date | undefined | null
+
+    @StringColumn_({nullable: false})
+    transactionHash!: string
 }

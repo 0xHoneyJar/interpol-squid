@@ -25,4 +25,7 @@ export class VaultStake {
 
     @DateTimeColumn_({nullable: false})
     timestamp!: Date
+
+    @StringColumn_({nullable: false})
+    transactionHash!: string
 }
