@@ -7,6 +7,7 @@ import {
   LPToken,
   Vault,
   VaultDeposit,
+  VaultWithdrawal,
   VaultStake,
   VaultTotalDeposit,
   VaultTotalStake,
@@ -19,6 +20,7 @@ processor.run(new TypeormDatabase(), async (ctx) => {
   const vaults: Vault[] = [];
   const lpTokens: LPToken[] = [];
   const vaultDeposits: VaultDeposit[] = [];
+  const vaultWithdrawals: VaultWithdrawal[] = [];
   const vaultTotalDepositsMap = new Map<string, VaultTotalDeposit>();
   const vaultStakes: VaultStake[] = [];
   const vaultUnstakes: VaultUnstake[] = [];
@@ -69,6 +71,38 @@ processor.run(new TypeormDatabase(), async (ctx) => {
           vaultAddress: log.address,
           tokenAddress: token,
           amount: amount + (existingDeposit?.amount || BigInt(0)),
+          lockExpiration: existingDeposit?.lockExpiration,
+        });
+        vaultTotalDepositsMap.set(id, updatedDeposit);
+      }
+
+      /*###############################################################
+                            WITHDRAW EVENT
+      ###############################################################*/
+      if (honeyVaultAbi.events.Withdrawn.is(log)) {
+        const { token, amount } = honeyVaultAbi.events.Withdrawn.decode(log);
+        // we add single deposit event
+        vaultWithdrawals.push(
+          new VaultWithdrawal({
+            id: log.id,
+            vaultAddress: log.address,
+            tokenAddress: token,
+            amount: amount,
+            timestamp: new Date(block.header.timestamp),
+            transactionHash: log.transaction?.hash,
+          })
+        );
+
+        // We also update the single entity that tracks the total deposit amount for each vault for each LP token
+        const id = log.address + "-" + token;
+        const existingDeposit =
+          vaultTotalDepositsMap.get(id) ||
+          (await ctx.store.get(VaultTotalDeposit, id));
+        const updatedDeposit = new VaultTotalDeposit({
+          id: id,
+          vaultAddress: log.address,
+          tokenAddress: token,
+          amount: (existingDeposit?.amount || BigInt(0)) - amount,
           lockExpiration: existingDeposit?.lockExpiration,
         });
         vaultTotalDepositsMap.set(id, updatedDeposit);

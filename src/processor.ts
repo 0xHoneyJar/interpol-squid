@@ -39,6 +39,7 @@ export const processor = new EvmBatchProcessor()
     topic0: [
       honeyVaultAbi.events.Initialized.topic,
       honeyVaultAbi.events.Deposited.topic,
+      honeyVaultAbi.events.Withdrawn.topic,
       honeyVaultAbi.events.LockedUntil.topic,
       honeyVaultAbi.events.Staked.topic,
       honeyVaultAbi.events.Unstaked.topic,
