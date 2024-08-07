@@ -2,8 +2,6 @@ import { TypeormDatabase } from "@subsquid/typeorm-store";
 import * as factoryAbi from "./abi/Factory";
 import * as honeyVaultAbi from "./abi/HoneyVault";
 import {
-  BGTBoost,
-  KodiakStake,
   LPToken,
   Vault,
   VaultDeposit,
@@ -12,6 +10,7 @@ import {
   VaultTotalDeposit,
   VaultTotalStake,
   VaultUnstake,
+  Fees,
 } from "./model";
 import { processor } from "./processor";
 // import * as kodiakAbi from './abi/Kodiak'
@@ -24,8 +23,8 @@ processor.run(new TypeormDatabase(), async (ctx) => {
   const vaultTotalDepositsMap = new Map<string, VaultTotalDeposit>();
   const vaultStakes: VaultStake[] = [];
   const vaultUnstakes: VaultUnstake[] = [];
-  const vaultTotalStakes: VaultTotalStake[] = [];
-  const bgtBoosts: BGTBoost[] = [];
+  const vaultTotalStakes = new Map<string, VaultTotalStake>();
+  const fees: Fees[] = [];
 
   for (let block of ctx.blocks) {
     for (let log of block.logs) {
@@ -145,19 +144,18 @@ processor.run(new TypeormDatabase(), async (ctx) => {
           })
         );
 
-        const vaultTotalStake = await ctx.store.get(
-          VaultTotalStake,
-          vaultAddress + "-" + token + "-" + stakingContract
-        );
-        vaultTotalStakes.push(
-          new VaultTotalStake({
-            id: vaultAddress + "-" + token + "-" + stakingContract,
-            vaultAddress,
-            tokenAddress: token,
-            stakingContract,
-            amount: amount + (vaultTotalStake?.amount || BigInt(0)),
-          })
-        );
+        const id = vaultAddress + "-" + token + "-" + stakingContract;
+        const vaultTotalStake =
+          vaultTotalStakes.get(id) ||
+          (await ctx.store.get(VaultTotalStake, id));
+        const updatedVaultTotalStake = new VaultTotalStake({
+          id,
+          vaultAddress,
+          tokenAddress: token,
+          stakingContract,
+          amount: amount + (vaultTotalStake?.amount || BigInt(0)),
+        });
+        vaultTotalStakes.set(id, updatedVaultTotalStake);
       }
 
       /*###############################################################
@@ -178,14 +176,33 @@ processor.run(new TypeormDatabase(), async (ctx) => {
           })
         );
 
-        const vaultTotalStake = await ctx.store.get(
-          VaultTotalStake,
-          log.address + "-" + token + "-" + stakingContract
-        );
-        vaultTotalStakes.push(
-          new VaultTotalStake({
-            id: log.address + "-" + token + "-" + stakingContract,
-            amount: vaultTotalStake!.amount! - amount, // at this point, the vaultTotalStake should > 0
+        const id = log.address + "-" + token + "-" + stakingContract;
+        const vaultTotalStake =
+          vaultTotalStakes.get(id) ||
+          (await ctx.store.get(VaultTotalStake, id));
+        const updatedVaultTotalStake = new VaultTotalStake({
+          id,
+          vaultAddress: log.address,
+          tokenAddress: token,
+          stakingContract,
+          amount: vaultTotalStake ? vaultTotalStake.amount! - amount : 0n, // at this point, the vaultTotalStake should > 0
+        });
+        vaultTotalStakes.set(id, updatedVaultTotalStake);
+      }
+
+      /*###############################################################
+                            FEE EVENT
+      ###############################################################*/
+      if (honeyVaultAbi.events.Fees.is(log)) {
+        const { referral, token, amount } =
+          honeyVaultAbi.events.Fees.decode(log);
+        fees.push(
+          new Fees({
+            id: log.id,
+            tokenAddress: token,
+            amount,
+            referral,
+            transactionHash: log.transaction?.hash,
           })
         );
       }
@@ -197,6 +214,6 @@ processor.run(new TypeormDatabase(), async (ctx) => {
   await ctx.store.upsert(Array.from(vaultTotalDepositsMap.values()));
   await ctx.store.upsert(vaultStakes);
   await ctx.store.upsert(vaultUnstakes);
-  await ctx.store.upsert(bgtBoosts);
-  await ctx.store.upsert(vaultTotalStakes);
+  await ctx.store.upsert(Array.from(vaultTotalStakes.values()));
+  await ctx.store.upsert(fees);
 });

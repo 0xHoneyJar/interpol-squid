@@ -67,20 +67,10 @@ type VaultTotalStake @entity {
   amount: BigInt!
 }
 
-type BGTBoost @entity {
+type Fees @entity {
   id: ID!
-  vaultAddress: String! @index
-  validator: String! @index
+  referral: String!
+  tokenAddress: String!
   amount: BigInt!
-  status: String! # "Queued" or "Activated"
-  timestamp: DateTime!
-}
-
-type KodiakStake @entity {
-  id: ID!
-  vaultAddress: String! @index
-  amount: BigInt!
-  lockDuration: Int!
-  kekId: String! @index
-  timestamp: DateTime!
+  transactionHash: String!
 }
