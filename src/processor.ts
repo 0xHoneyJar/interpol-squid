@@ -43,15 +43,7 @@ export const processor = new EvmBatchProcessor()
       honeyVaultAbi.events.LockedUntil.topic,
       honeyVaultAbi.events.Staked.topic,
       honeyVaultAbi.events.Unstaked.topic,
-    ],
-    transaction: true,
-  })
-  .addLog({
-    address: [BGT_ADDRESS], // BGT contract address
-    topic0: [
-      bgtAbi.events.QueueBoost.topic,
-      bgtAbi.events.ActivateBoost.topic,
-      bgtAbi.events.DropBoost.topic,
+      honeyVaultAbi.events.Fees.topic,
     ],
     transaction: true,
   });

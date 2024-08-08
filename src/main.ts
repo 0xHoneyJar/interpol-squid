@@ -211,6 +211,7 @@ processor.run(new TypeormDatabase(), async (ctx) => {
   await ctx.store.upsert(vaults);
   await ctx.store.upsert(lpTokens);
   await ctx.store.upsert(vaultDeposits);
+  await ctx.store.upsert(vaultWithdrawals);
   await ctx.store.upsert(Array.from(vaultTotalDepositsMap.values()));
   await ctx.store.upsert(vaultStakes);
   await ctx.store.upsert(vaultUnstakes);
