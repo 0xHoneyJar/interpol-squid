@@ -46,6 +46,15 @@ export const processor = new EvmBatchProcessor()
       honeyVaultAbi.events.Fees.topic,
     ],
     transaction: true,
+  })
+  .addLog({
+    address: [BGT_ADDRESS],
+    topic0: [
+      bgtAbi.events.ActivateBoost.topic,
+      bgtAbi.events.QueueBoost.topic,
+      bgtAbi.events.CancelBoost.topic,
+      bgtAbi.events.DropBoost.topic,
+    ],
   });
 
 export type Fields = EvmBatchProcessorFields<typeof processor>;

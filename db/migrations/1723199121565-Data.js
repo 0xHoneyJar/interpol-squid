@@ -1,5 +1,5 @@
-module.exports = class Data1722535937893 {
-    name = 'Data1722535937893'
+module.exports = class Data1723199121565 {
+    name = 'Data1723199121565'
 
     async up(db) {
         await db.query(`CREATE TABLE "vault" ("id" character varying NOT NULL, "owner" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "address" text NOT NULL, CONSTRAINT "PK_dd0898234c77f9d97585171ac59" PRIMARY KEY ("id"))`)
@@ -20,12 +20,9 @@ module.exports = class Data1722535937893 {
         await db.query(`CREATE TABLE "vault_total_stake" ("id" character varying NOT NULL, "vault_address" text NOT NULL, "token_address" text NOT NULL, "staking_contract" text NOT NULL, "amount" numeric NOT NULL, CONSTRAINT "PK_3d10d692393b8c8998bc637cec4" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_ea08c3c51a607ff4c348d3be9e" ON "vault_total_stake" ("vault_address") `)
         await db.query(`CREATE INDEX "IDX_312125dee471881466c261cac7" ON "vault_total_stake" ("staking_contract") `)
-        await db.query(`CREATE TABLE "bgt_boost" ("id" character varying NOT NULL, "vault_address" text NOT NULL, "validator" text NOT NULL, "amount" numeric NOT NULL, "status" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, CONSTRAINT "PK_dbf41c3d0c772f4c40e43670f54" PRIMARY KEY ("id"))`)
-        await db.query(`CREATE INDEX "IDX_ab745d923f9012cfd04302ea9f" ON "bgt_boost" ("vault_address") `)
-        await db.query(`CREATE INDEX "IDX_047f895f4973d18ed27e1b5690" ON "bgt_boost" ("validator") `)
-        await db.query(`CREATE TABLE "kodiak_stake" ("id" character varying NOT NULL, "vault_address" text NOT NULL, "amount" numeric NOT NULL, "lock_duration" integer NOT NULL, "kek_id" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, CONSTRAINT "PK_de3214c7608d73300ea945b5166" PRIMARY KEY ("id"))`)
-        await db.query(`CREATE INDEX "IDX_6e7205535a48c2417a727550e4" ON "kodiak_stake" ("vault_address") `)
-        await db.query(`CREATE INDEX "IDX_1c98c6d2f62f8d7ff53249af69" ON "kodiak_stake" ("kek_id") `)
+        await db.query(`CREATE TABLE "fees" ("id" character varying NOT NULL, "referral" text NOT NULL, "token_address" text NOT NULL, "amount" numeric NOT NULL, "transaction_hash" text NOT NULL, CONSTRAINT "PK_97f3a1b1b8ee5674fd4da93f461" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "bgt_delegation" ("id" character varying NOT NULL, "vault_address" text NOT NULL, "validator" text NOT NULL, "queued" numeric NOT NULL, "activated" numeric NOT NULL, CONSTRAINT "PK_1df066562fa706e41ff490333ed" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_15e14891098658f3175934bbc6" ON "bgt_delegation" ("vault_address") `)
     }
 
     async down(db) {
@@ -47,11 +44,8 @@ module.exports = class Data1722535937893 {
         await db.query(`DROP TABLE "vault_total_stake"`)
         await db.query(`DROP INDEX "public"."IDX_ea08c3c51a607ff4c348d3be9e"`)
         await db.query(`DROP INDEX "public"."IDX_312125dee471881466c261cac7"`)
-        await db.query(`DROP TABLE "bgt_boost"`)
-        await db.query(`DROP INDEX "public"."IDX_ab745d923f9012cfd04302ea9f"`)
-        await db.query(`DROP INDEX "public"."IDX_047f895f4973d18ed27e1b5690"`)
-        await db.query(`DROP TABLE "kodiak_stake"`)
-        await db.query(`DROP INDEX "public"."IDX_6e7205535a48c2417a727550e4"`)
-        await db.query(`DROP INDEX "public"."IDX_1c98c6d2f62f8d7ff53249af69"`)
+        await db.query(`DROP TABLE "fees"`)
+        await db.query(`DROP TABLE "bgt_delegation"`)
+        await db.query(`DROP INDEX "public"."IDX_15e14891098658f3175934bbc6"`)
     }
 }

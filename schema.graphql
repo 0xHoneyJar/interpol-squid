@@ -74,3 +74,11 @@ type Fees @entity {
   amount: BigInt!
   transactionHash: String!
 }
+
+type BGTDelegation @entity {
+  id: ID!
+  vaultAddress: String! @index
+  validator: String!
+  queued: BigInt!
+  activated: BigInt!
+}

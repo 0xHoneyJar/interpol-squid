@@ -11,8 +11,10 @@ import {
   VaultTotalStake,
   VaultUnstake,
   Fees,
+  BGTDelegation,
 } from "./model";
 import { processor } from "./processor";
+import * as bgtAbi from "./abi/BGT";
 // import * as kodiakAbi from './abi/Kodiak'
 
 processor.run(new TypeormDatabase(), async (ctx) => {
@@ -25,6 +27,7 @@ processor.run(new TypeormDatabase(), async (ctx) => {
   const vaultUnstakes: VaultUnstake[] = [];
   const vaultTotalStakes = new Map<string, VaultTotalStake>();
   const fees: Fees[] = [];
+  const bgtDelegations = new Map<string, BGTDelegation>();
 
   for (let block of ctx.blocks) {
     for (let log of block.logs) {
@@ -206,6 +209,69 @@ processor.run(new TypeormDatabase(), async (ctx) => {
           })
         );
       }
+
+      /*###############################################################
+                            BGT DELEGATION related
+      ###############################################################*/
+      if (bgtAbi.events.QueueBoost.is(log)) {
+        const { validator, amount } = bgtAbi.events.QueueBoost.decode(log);
+        const id = log.address + "-" + validator;
+        const existingDelegation =
+          bgtDelegations.get(id) || (await ctx.store.get(BGTDelegation, id));
+        let updatedDelegation: BGTDelegation = new BGTDelegation({
+          id,
+          validator,
+          vaultAddress: log.address,
+          queued: (existingDelegation?.queued || BigInt(0)) + amount,
+          activated: existingDelegation?.activated || BigInt(0),
+        });
+        bgtDelegations.set(id, updatedDelegation);
+      }
+
+      if (bgtAbi.events.ActivateBoost.is(log)) {
+        const { validator, amount } = bgtAbi.events.ActivateBoost.decode(log);
+        const id = log.address + "-" + validator;
+        const existingDelegation =
+          bgtDelegations.get(id) || (await ctx.store.get(BGTDelegation, id));
+        let updatedDelegation: BGTDelegation = new BGTDelegation({
+          id,
+          validator,
+          vaultAddress: log.address,
+          queued: (existingDelegation?.queued || BigInt(0)) - amount,
+          activated: (existingDelegation?.activated || BigInt(0)) + amount,
+        });
+        bgtDelegations.set(id, updatedDelegation);
+      }
+
+      if (bgtAbi.events.CancelBoost.is(log)) {
+        const { validator, amount } = bgtAbi.events.CancelBoost.decode(log);
+        const id = log.address + "-" + validator;
+        const existingDelegation =
+          bgtDelegations.get(id) || (await ctx.store.get(BGTDelegation, id));
+        let updatedDelegation: BGTDelegation = new BGTDelegation({
+          id,
+          validator,
+          vaultAddress: log.address,
+          queued: (existingDelegation?.queued || BigInt(0)) - amount,
+          activated: existingDelegation?.activated || BigInt(0),
+        });
+        bgtDelegations.set(id, updatedDelegation);
+      }
+
+      if (bgtAbi.events.DropBoost.is(log)) {
+        const { validator, amount } = bgtAbi.events.DropBoost.decode(log);
+        const id = log.address + "-" + validator;
+        const existingDelegation =
+          bgtDelegations.get(id) || (await ctx.store.get(BGTDelegation, id));
+        let updatedDelegation: BGTDelegation = new BGTDelegation({
+          id,
+          validator,
+          vaultAddress: log.address,
+          queued: existingDelegation?.queued || BigInt(0),
+          activated: (existingDelegation?.activated || BigInt(0)) - amount,
+        });
+        bgtDelegations.set(id, updatedDelegation);
+      }
     }
   }
   await ctx.store.upsert(vaults);
@@ -217,4 +283,5 @@ processor.run(new TypeormDatabase(), async (ctx) => {
   await ctx.store.upsert(vaultUnstakes);
   await ctx.store.upsert(Array.from(vaultTotalStakes.values()));
   await ctx.store.upsert(fees);
+  await ctx.store.upsert(Array.from(bgtDelegations.values()));
 });
