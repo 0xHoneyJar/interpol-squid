@@ -38,7 +38,7 @@ processor.run(new TypeormDatabase(), async (ctx) => {
         const { owner, vault } = factoryAbi.events.NewVault.decode(log);
         vaults.push(
           new Vault({
-            id: log.id,
+            id: vault,
             owner: owner,
             timestamp: new Date(block.header.timestamp),
             address: vault,
@@ -214,14 +214,19 @@ processor.run(new TypeormDatabase(), async (ctx) => {
                             BGT DELEGATION related
       ###############################################################*/
       if (bgtAbi.events.QueueBoost.is(log)) {
-        const { validator, amount } = bgtAbi.events.QueueBoost.decode(log);
-        const id = log.address + "-" + validator;
+        const { sender, validator, amount } =
+          bgtAbi.events.QueueBoost.decode(log);
+        const vaultAddress = sender;
+        const id = vaultAddress + "-" + validator;
         const existingDelegation =
           bgtDelegations.get(id) || (await ctx.store.get(BGTDelegation, id));
+        // if vault doesn't exist, we skip
+        const vault = await ctx.store.get(Vault, vaultAddress);
+        if (!vault) continue;
         let updatedDelegation: BGTDelegation = new BGTDelegation({
           id,
           validator,
-          vaultAddress: log.address,
+          vaultAddress,
           queued: (existingDelegation?.queued || BigInt(0)) + amount,
           activated: existingDelegation?.activated || BigInt(0),
         });
@@ -229,14 +234,17 @@ processor.run(new TypeormDatabase(), async (ctx) => {
       }
 
       if (bgtAbi.events.ActivateBoost.is(log)) {
-        const { validator, amount } = bgtAbi.events.ActivateBoost.decode(log);
-        const id = log.address + "-" + validator;
+        const { sender, validator, amount } =
+          bgtAbi.events.ActivateBoost.decode(log);
+        const vaultAddress = sender;
+        const id = vaultAddress + "-" + validator;
         const existingDelegation =
           bgtDelegations.get(id) || (await ctx.store.get(BGTDelegation, id));
+        if (!existingDelegation) continue;
         let updatedDelegation: BGTDelegation = new BGTDelegation({
           id,
           validator,
-          vaultAddress: log.address,
+          vaultAddress,
           queued: (existingDelegation?.queued || BigInt(0)) - amount,
           activated: (existingDelegation?.activated || BigInt(0)) + amount,
         });
@@ -244,14 +252,17 @@ processor.run(new TypeormDatabase(), async (ctx) => {
       }
 
       if (bgtAbi.events.CancelBoost.is(log)) {
-        const { validator, amount } = bgtAbi.events.CancelBoost.decode(log);
-        const id = log.address + "-" + validator;
+        const { sender, validator, amount } =
+          bgtAbi.events.CancelBoost.decode(log);
+        const vaultAddress = sender;
+        const id = vaultAddress + "-" + validator;
         const existingDelegation =
           bgtDelegations.get(id) || (await ctx.store.get(BGTDelegation, id));
+        if (!existingDelegation) continue;
         let updatedDelegation: BGTDelegation = new BGTDelegation({
           id,
           validator,
-          vaultAddress: log.address,
+          vaultAddress,
           queued: (existingDelegation?.queued || BigInt(0)) - amount,
           activated: existingDelegation?.activated || BigInt(0),
         });
@@ -259,14 +270,18 @@ processor.run(new TypeormDatabase(), async (ctx) => {
       }
 
       if (bgtAbi.events.DropBoost.is(log)) {
-        const { validator, amount } = bgtAbi.events.DropBoost.decode(log);
-        const id = log.address + "-" + validator;
+        const { sender, validator, amount } =
+          bgtAbi.events.DropBoost.decode(log);
+        const vaultAddress = sender;
+        const id = vaultAddress + "-" + validator;
         const existingDelegation =
           bgtDelegations.get(id) || (await ctx.store.get(BGTDelegation, id));
+        // skip if no existing delegation
+        if (!existingDelegation) continue;
         let updatedDelegation: BGTDelegation = new BGTDelegation({
           id,
           validator,
-          vaultAddress: log.address,
+          vaultAddress,
           queued: existingDelegation?.queued || BigInt(0),
           activated: (existingDelegation?.activated || BigInt(0)) - amount,
         });
