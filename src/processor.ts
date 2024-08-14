@@ -17,8 +17,6 @@ export const processor = new EvmBatchProcessor()
   .setGateway("https://v2.archive.subsquid.io/network/berachain-bartio")
   .setRpcEndpoint({
     url: assertNotNull(process.env.RPC_BERA_HTTP, "No RPC endpoint supplied"),
-    maxBatchCallSize: 10000,
-    // rateLimit: 10,
   })
   .setFinalityConfirmation(5)
   .setFields({
