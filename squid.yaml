@@ -1,6 +1,6 @@
 manifestVersion: subsquid.io/v0.1
 name: interpol-squid
-version: 3
+version: 4
 description: "Interpol Squid"
 build:
 deploy:

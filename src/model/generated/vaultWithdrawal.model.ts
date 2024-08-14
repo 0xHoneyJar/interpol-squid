@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, StringColumn as StringColumn_, Index as Index_, BigIntColumn as BigIntColumn_, DateTimeColumn as DateTimeColumn_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, StringColumn as StringColumn_, Index as Index_, BigIntColumn as BigIntColumn_} from "@subsquid/typeorm-store"
 
 @Entity_()
 export class VaultWithdrawal {
@@ -19,8 +19,8 @@ export class VaultWithdrawal {
     @BigIntColumn_({nullable: false})
     amount!: bigint
 
-    @DateTimeColumn_({nullable: false})
-    timestamp!: Date
+    @BigIntColumn_({nullable: false})
+    timestamp!: bigint
 
     @StringColumn_({nullable: false})
     transactionHash!: string

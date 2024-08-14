@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, StringColumn as StringColumn_, Index as Index_, DateTimeColumn as DateTimeColumn_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, StringColumn as StringColumn_, Index as Index_, BigIntColumn as BigIntColumn_} from "@subsquid/typeorm-store"
 
 @Entity_()
 export class Vault {
@@ -13,8 +13,8 @@ export class Vault {
     @StringColumn_({nullable: false})
     owner!: string
 
-    @DateTimeColumn_({nullable: false})
-    timestamp!: Date
+    @BigIntColumn_({nullable: false})
+    timestamp!: bigint
 
     @StringColumn_({nullable: false})
     address!: string

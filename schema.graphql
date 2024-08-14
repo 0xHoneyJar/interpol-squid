@@ -1,7 +1,7 @@
 type Vault @entity {
   id: ID!
   owner: String! @index
-  timestamp: DateTime!
+  timestamp: BigInt!
   address: String!
 }
 
@@ -17,8 +17,8 @@ type VaultDeposit @entity {
   vaultAddress: String! @index
   tokenAddress: String!
   amount: BigInt!
-  timestamp: DateTime!
-  lockExpiration: DateTime
+  timestamp: BigInt!
+  lockExpiration: BigInt
   transactionHash: String!
 }
 
@@ -27,7 +27,7 @@ type VaultWithdrawal @entity {
   vaultAddress: String! @index
   tokenAddress: String!
   amount: BigInt!
-  timestamp: DateTime!
+  timestamp: BigInt!
   transactionHash: String!
 }
 
@@ -36,7 +36,7 @@ type VaultTotalDeposit @entity {
   vaultAddress: String! @index
   tokenAddress: String!
   amount: BigInt!
-  lockExpiration: DateTime
+  lockExpiration: BigInt
 }
 
 type VaultStake @entity {
@@ -45,7 +45,7 @@ type VaultStake @entity {
   tokenAddress: String!
   stakingContract: String! @index
   amount: BigInt!
-  timestamp: DateTime!
+  timestamp: BigInt!
   transactionHash: String!
 }
 
@@ -55,7 +55,7 @@ type VaultUnstake @entity {
   tokenAddress: String!
   stakingContract: String! @index
   amount: BigInt!
-  timestamp: DateTime!
+  timestamp: BigInt!
   transactionHash: String!
 }
 
