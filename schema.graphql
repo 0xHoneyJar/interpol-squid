@@ -82,3 +82,11 @@ type BGTDelegation @entity {
   queued: BigInt!
   activated: BigInt!
 }
+
+type VaultRewardsClaim @entity {
+  id: ID!
+  vaultAddress: String! @index
+  stakingContract: String! @index
+  timestamp: BigInt!
+  transactionHash: String!
+}

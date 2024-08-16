@@ -11,18 +11,22 @@ export const events = {
     OwnershipHandoverCanceled: event("0xfa7b8eab7da67f412cc9575ed43464468f9bfbae89d1675917346ca6d8fe3c92", "OwnershipHandoverCanceled(address)", {"pendingOwner": indexed(p.address)}),
     OwnershipHandoverRequested: event("0xdbf36a107da19e49527a7176a1babf963b4b0ff8cde35ee35d6cd8f1f9ac7e1d", "OwnershipHandoverRequested(address)", {"pendingOwner": indexed(p.address)}),
     OwnershipTransferred: event("0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0", "OwnershipTransferred(address,address)", {"oldOwner": indexed(p.address), "newOwner": indexed(p.address)}),
+    RewardsClaimed: event("0xfec02445b4dcb9e977f70b2966aab1907694acaa22a61ef1ff7d6ee2cb8ed780", "RewardsClaimed(address)", {"stakingContract": p.address}),
     Staked: event("0x5dac0c1b1112564a045ba943c9d50270893e8e826c49be8e7073adc713ab7bd7", "Staked(address,address,uint256)", {"stakingContract": indexed(p.address), "token": indexed(p.address), "amount": p.uint256}),
     Unstaked: event("0xd8654fcc8cf5b36d30b3f5e4688fc78118e6d68de60b9994e09902268b57c3e3", "Unstaked(address,address,uint256)", {"stakingContract": indexed(p.address), "token": indexed(p.address), "amount": p.uint256}),
     Withdrawn: event("0x7084f5476618d8e60b11ef0d7d3f06914655adb8793e28ff7f018d4c76d505d5", "Withdrawn(address,uint256)", {"token": indexed(p.address), "amount": p.uint256}),
 }
 
 export const functions = {
-    activateBoost: fun("0xaffcf9ba", "activateBoost()", {}, ),
+    activateBoost: fun("0x95c0e232", "activateBoost(address)", {"_validator": p.address}, ),
     burnBGTForBERA: fun("0x45d514e9", "burnBGTForBERA(uint256)", {"_amount": p.uint256}, ),
     cancelOwnershipHandover: fun("0x54d1f13d", "cancelOwnershipHandover()", {}, ),
+    cancelQueuedBoost: fun("0x66b35e98", "cancelQueuedBoost(uint128,address)", {"_amount": p.uint128, "_validator": p.address}, ),
     claimRewards: fun("0x18b4d37f", "claimRewards(address,bytes)", {"_stakingContract": p.address, "data": p.bytes}, ),
     completeOwnershipHandover: fun("0xf04e283e", "completeOwnershipHandover(address)", {"pendingOwner": p.address}, ),
+    delegateBGT: fun("0x913a561b", "delegateBGT(uint128,address)", {"_amount": p.uint128, "_validator": p.address}, ),
     depositAndLock: fun("0xa6da1e7d", "depositAndLock(address,uint256,uint256)", {"_LPToken": p.address, "_amount": p.uint256, "_expiration": p.uint256}, ),
+    dropBoost: fun("0x1db6c3a1", "dropBoost(uint128,address)", {"_amount": p.uint128, "_validator": p.address}, ),
     expirations: viewFun("0x3c74db0f", "expirations(address)", {"LPToken": p.address}, p.uint256),
     initialize: fun("0xfecf9734", "initialize(address,address,address,bool)", {"_owner": p.address, "_honeyQueen": p.address, "_referral": p.address, "_unlocked": p.bool}, ),
     migrate: fun("0xaf133d4b", "migrate(address[],address)", {"_LPTokens": p.array(p.address), "_newHoneyVault": p.address}, ),
@@ -95,6 +99,7 @@ export type MigratedEventArgs = EParams<typeof events.Migrated>
 export type OwnershipHandoverCanceledEventArgs = EParams<typeof events.OwnershipHandoverCanceled>
 export type OwnershipHandoverRequestedEventArgs = EParams<typeof events.OwnershipHandoverRequested>
 export type OwnershipTransferredEventArgs = EParams<typeof events.OwnershipTransferred>
+export type RewardsClaimedEventArgs = EParams<typeof events.RewardsClaimed>
 export type StakedEventArgs = EParams<typeof events.Staked>
 export type UnstakedEventArgs = EParams<typeof events.Unstaked>
 export type WithdrawnEventArgs = EParams<typeof events.Withdrawn>
@@ -109,14 +114,23 @@ export type BurnBGTForBERAReturn = FunctionReturn<typeof functions.burnBGTForBER
 export type CancelOwnershipHandoverParams = FunctionArguments<typeof functions.cancelOwnershipHandover>
 export type CancelOwnershipHandoverReturn = FunctionReturn<typeof functions.cancelOwnershipHandover>
 
+export type CancelQueuedBoostParams = FunctionArguments<typeof functions.cancelQueuedBoost>
+export type CancelQueuedBoostReturn = FunctionReturn<typeof functions.cancelQueuedBoost>
+
 export type ClaimRewardsParams = FunctionArguments<typeof functions.claimRewards>
 export type ClaimRewardsReturn = FunctionReturn<typeof functions.claimRewards>
 
 export type CompleteOwnershipHandoverParams = FunctionArguments<typeof functions.completeOwnershipHandover>
 export type CompleteOwnershipHandoverReturn = FunctionReturn<typeof functions.completeOwnershipHandover>
 
+export type DelegateBGTParams = FunctionArguments<typeof functions.delegateBGT>
+export type DelegateBGTReturn = FunctionReturn<typeof functions.delegateBGT>
+
 export type DepositAndLockParams = FunctionArguments<typeof functions.depositAndLock>
 export type DepositAndLockReturn = FunctionReturn<typeof functions.depositAndLock>
+
+export type DropBoostParams = FunctionArguments<typeof functions.dropBoost>
+export type DropBoostReturn = FunctionReturn<typeof functions.dropBoost>
 
 export type ExpirationsParams = FunctionArguments<typeof functions.expirations>
 export type ExpirationsReturn = FunctionReturn<typeof functions.expirations>

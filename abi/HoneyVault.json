@@ -3,7 +3,9 @@
   {
     "type": "function",
     "name": "activateBoost",
-    "inputs": [],
+    "inputs": [
+      { "name": "_validator", "type": "address", "internalType": "address" }
+    ],
     "outputs": [],
     "stateMutability": "nonpayable"
   },
@@ -22,6 +24,16 @@
     "inputs": [],
     "outputs": [],
     "stateMutability": "payable"
+  },
+  {
+    "type": "function",
+    "name": "cancelQueuedBoost",
+    "inputs": [
+      { "name": "_amount", "type": "uint128", "internalType": "uint128" },
+      { "name": "_validator", "type": "address", "internalType": "address" }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
   },
   {
     "type": "function",
@@ -48,11 +60,31 @@
   },
   {
     "type": "function",
+    "name": "delegateBGT",
+    "inputs": [
+      { "name": "_amount", "type": "uint128", "internalType": "uint128" },
+      { "name": "_validator", "type": "address", "internalType": "address" }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
     "name": "depositAndLock",
     "inputs": [
       { "name": "_LPToken", "type": "address", "internalType": "address" },
       { "name": "_amount", "type": "uint256", "internalType": "uint256" },
       { "name": "_expiration", "type": "uint256", "internalType": "uint256" }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "dropBoost",
+    "inputs": [
+      { "name": "_amount", "type": "uint128", "internalType": "uint128" },
+      { "name": "_validator", "type": "address", "internalType": "address" }
     ],
     "outputs": [],
     "stateMutability": "nonpayable"
@@ -450,6 +482,19 @@
   },
   {
     "type": "event",
+    "name": "RewardsClaimed",
+    "inputs": [
+      {
+        "name": "stakingContract",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
     "name": "Staked",
     "inputs": [
       {
@@ -525,7 +570,6 @@
   { "type": "error", "name": "MigrationNotEnabled", "inputs": [] },
   { "type": "error", "name": "NewOwnerIsZeroAddress", "inputs": [] },
   { "type": "error", "name": "NoHandoverRequest", "inputs": [] },
-  { "type": "error", "name": "NotEnoughBoostedToBurn", "inputs": [] },
   { "type": "error", "name": "NotExpiredYet", "inputs": [] },
   { "type": "error", "name": "SelectorNotAllowed", "inputs": [] },
   { "type": "error", "name": "StakeFailed", "inputs": [] },

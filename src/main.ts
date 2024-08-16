@@ -6,6 +6,7 @@ import {
   BGTDelegation,
   Fees,
   LPToken,
+  VaultRewardsClaim,
   Vault,
   VaultDeposit,
   VaultStake,
@@ -28,6 +29,7 @@ processor.run(new TypeormDatabase(), async (ctx) => {
     vaultTotalStakes: new Map<string, VaultTotalStake>(),
     fees: [] as Fees[],
     bgtDelegations: new Map<string, BGTDelegation>(),
+    vaultRewardsClaims: [] as VaultRewardsClaim[],
   };
 
   for (const block of ctx.blocks) {
@@ -54,6 +56,8 @@ async function processLog(log: any, block: any, ctx: any, entities: any) {
     await processUnstake(log, block, ctx, entities);
   } else if (honeyVaultAbi.events.Fees.is(log)) {
     processFees(log, entities);
+  } else if (honeyVaultAbi.events.RewardsClaimed.is(log)) {
+    await processRewardsClaim(log, block, entities);
   } else if (bgtAbi.events.QueueBoost.is(log)) {
     await processBGTQueueBoost(log, ctx, entities);
   } else if (bgtAbi.events.ActivateBoost.is(log)) {
@@ -168,6 +172,19 @@ function processFees(log: any, entities: any) {
   );
 }
 
+async function processRewardsClaim(log: any, block: any, entities: any) {
+  const { stakingContract } = honeyVaultAbi.events.RewardsClaimed.decode(log);
+  entities.vaultRewardsClaims.push(
+    new VaultRewardsClaim({
+      id: log.id,
+      vaultAddress: log.address,
+      stakingContract: stakingContract,
+      timestamp: BigInt(block.header.timestamp),
+      transactionHash: log.transaction?.hash,
+    })
+  );
+}
+
 async function processBGTQueueBoost(log: any, ctx: any, entities: any) {
   const { sender, validator, amount } = bgtAbi.events.QueueBoost.decode(log);
   await updateBGTDelegation(sender, validator, amount, 0n, ctx, entities);
@@ -198,6 +215,7 @@ async function saveEntities(ctx: any, entities: any) {
   await ctx.store.upsert(entities.vaultUnstakes);
   await ctx.store.upsert(Array.from(entities.vaultTotalStakes.values()));
   await ctx.store.upsert(entities.fees);
+  await ctx.store.upsert(entities.vaultRewardsClaims);
   await ctx.store.upsert(Array.from(entities.bgtDelegations.values()));
 }
 
