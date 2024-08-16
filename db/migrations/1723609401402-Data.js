@@ -1,0 +1,51 @@
+module.exports = class Data1723609401402 {
+    name = 'Data1723609401402'
+
+    async up(db) {
+        await db.query(`CREATE TABLE "vault" ("id" character varying NOT NULL, "owner" text NOT NULL, "timestamp" numeric NOT NULL, "address" text NOT NULL, CONSTRAINT "PK_dd0898234c77f9d97585171ac59" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_fcb1371031401437ab3fe5db8a" ON "vault" ("owner") `)
+        await db.query(`CREATE TABLE "lp_token" ("id" character varying NOT NULL, "address" text NOT NULL, "name" text, "symbol" text, CONSTRAINT "PK_3737dbc5233b14a02a3756d2597" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "vault_deposit" ("id" character varying NOT NULL, "vault_address" text NOT NULL, "token_address" text NOT NULL, "amount" numeric NOT NULL, "timestamp" numeric NOT NULL, "lock_expiration" numeric, "transaction_hash" text NOT NULL, CONSTRAINT "PK_eb436a184ae6cfb4f8f1ae05994" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_a12684c8c172fa0a93d15559bc" ON "vault_deposit" ("vault_address") `)
+        await db.query(`CREATE TABLE "vault_withdrawal" ("id" character varying NOT NULL, "vault_address" text NOT NULL, "token_address" text NOT NULL, "amount" numeric NOT NULL, "timestamp" numeric NOT NULL, "transaction_hash" text NOT NULL, CONSTRAINT "PK_7c4355ab25ee61d7dff9a03de83" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_d78cc26a22ecf57bc1e50416c0" ON "vault_withdrawal" ("vault_address") `)
+        await db.query(`CREATE TABLE "vault_total_deposit" ("id" character varying NOT NULL, "vault_address" text NOT NULL, "token_address" text NOT NULL, "amount" numeric NOT NULL, "lock_expiration" numeric, CONSTRAINT "PK_1488bb6646f12fc65dcc4ec7300" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_685a7d7269806d1f735a42088d" ON "vault_total_deposit" ("vault_address") `)
+        await db.query(`CREATE TABLE "vault_stake" ("id" character varying NOT NULL, "vault_address" text NOT NULL, "token_address" text NOT NULL, "staking_contract" text NOT NULL, "amount" numeric NOT NULL, "timestamp" numeric NOT NULL, "transaction_hash" text NOT NULL, CONSTRAINT "PK_1d80f0c1fb43f3314d237ae78a6" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_87ec2afd89f8655b74e127f925" ON "vault_stake" ("vault_address") `)
+        await db.query(`CREATE INDEX "IDX_e9441bb55fc7d8cfda3bcbab77" ON "vault_stake" ("staking_contract") `)
+        await db.query(`CREATE TABLE "vault_unstake" ("id" character varying NOT NULL, "vault_address" text NOT NULL, "token_address" text NOT NULL, "staking_contract" text NOT NULL, "amount" numeric NOT NULL, "timestamp" numeric NOT NULL, "transaction_hash" text NOT NULL, CONSTRAINT "PK_46be0405d01f6243523d2cf091f" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_1bfb7ba5e9f57d7ff90e182062" ON "vault_unstake" ("vault_address") `)
+        await db.query(`CREATE INDEX "IDX_90f61fb07e28250fd2392dfabc" ON "vault_unstake" ("staking_contract") `)
+        await db.query(`CREATE TABLE "vault_total_stake" ("id" character varying NOT NULL, "vault_address" text NOT NULL, "token_address" text NOT NULL, "staking_contract" text NOT NULL, "amount" numeric NOT NULL, CONSTRAINT "PK_3d10d692393b8c8998bc637cec4" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_ea08c3c51a607ff4c348d3be9e" ON "vault_total_stake" ("vault_address") `)
+        await db.query(`CREATE INDEX "IDX_312125dee471881466c261cac7" ON "vault_total_stake" ("staking_contract") `)
+        await db.query(`CREATE TABLE "fees" ("id" character varying NOT NULL, "referral" text NOT NULL, "token_address" text NOT NULL, "amount" numeric NOT NULL, "transaction_hash" text NOT NULL, CONSTRAINT "PK_97f3a1b1b8ee5674fd4da93f461" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "bgt_delegation" ("id" character varying NOT NULL, "vault_address" text NOT NULL, "validator" text NOT NULL, "queued" numeric NOT NULL, "activated" numeric NOT NULL, CONSTRAINT "PK_1df066562fa706e41ff490333ed" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_15e14891098658f3175934bbc6" ON "bgt_delegation" ("vault_address") `)
+    }
+
+    async down(db) {
+        await db.query(`DROP TABLE "vault"`)
+        await db.query(`DROP INDEX "public"."IDX_fcb1371031401437ab3fe5db8a"`)
+        await db.query(`DROP TABLE "lp_token"`)
+        await db.query(`DROP TABLE "vault_deposit"`)
+        await db.query(`DROP INDEX "public"."IDX_a12684c8c172fa0a93d15559bc"`)
+        await db.query(`DROP TABLE "vault_withdrawal"`)
+        await db.query(`DROP INDEX "public"."IDX_d78cc26a22ecf57bc1e50416c0"`)
+        await db.query(`DROP TABLE "vault_total_deposit"`)
+        await db.query(`DROP INDEX "public"."IDX_685a7d7269806d1f735a42088d"`)
+        await db.query(`DROP TABLE "vault_stake"`)
+        await db.query(`DROP INDEX "public"."IDX_87ec2afd89f8655b74e127f925"`)
+        await db.query(`DROP INDEX "public"."IDX_e9441bb55fc7d8cfda3bcbab77"`)
+        await db.query(`DROP TABLE "vault_unstake"`)
+        await db.query(`DROP INDEX "public"."IDX_1bfb7ba5e9f57d7ff90e182062"`)
+        await db.query(`DROP INDEX "public"."IDX_90f61fb07e28250fd2392dfabc"`)
+        await db.query(`DROP TABLE "vault_total_stake"`)
+        await db.query(`DROP INDEX "public"."IDX_ea08c3c51a607ff4c348d3be9e"`)
+        await db.query(`DROP INDEX "public"."IDX_312125dee471881466c261cac7"`)
+        await db.query(`DROP TABLE "fees"`)
+        await db.query(`DROP TABLE "bgt_delegation"`)
+        await db.query(`DROP INDEX "public"."IDX_15e14891098658f3175934bbc6"`)
+    }
+}

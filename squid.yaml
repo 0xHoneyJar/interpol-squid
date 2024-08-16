@@ -1,18 +1,18 @@
 manifestVersion: subsquid.io/v0.1
 name: interpol-squid
-version: 1
-description: 'The very first evm squid from manifest  '
-build: 
+version: 4
+description: "Interpol Squid"
+build:
 deploy:
+  env:
+    RPC_BERA_HTTP: ${{ secrets.RPC_BERA_HTTP }}
   addons:
-    postgres: 
-    rpc:
-      - eth.http
+    postgres:
+    # rpc:
+    #   - eth.http
   processor:
-    cmd:
-      - sqd
-      - process:prod
+    cmd: ["sqd", "process:prod"]
   api:
-    cmd:
-      - sqd
-      - serve:prod
+    cmd: ["sqd", "serve:prod"]
+scale:
+  dedicated: true
