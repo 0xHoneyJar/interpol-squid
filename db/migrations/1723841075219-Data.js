@@ -1,5 +1,5 @@
-module.exports = class Data1723609401402 {
-    name = 'Data1723609401402'
+module.exports = class Data1723841075219 {
+    name = 'Data1723841075219'
 
     async up(db) {
         await db.query(`CREATE TABLE "vault" ("id" character varying NOT NULL, "owner" text NOT NULL, "timestamp" numeric NOT NULL, "address" text NOT NULL, CONSTRAINT "PK_dd0898234c77f9d97585171ac59" PRIMARY KEY ("id"))`)
@@ -23,6 +23,9 @@ module.exports = class Data1723609401402 {
         await db.query(`CREATE TABLE "fees" ("id" character varying NOT NULL, "referral" text NOT NULL, "token_address" text NOT NULL, "amount" numeric NOT NULL, "transaction_hash" text NOT NULL, CONSTRAINT "PK_97f3a1b1b8ee5674fd4da93f461" PRIMARY KEY ("id"))`)
         await db.query(`CREATE TABLE "bgt_delegation" ("id" character varying NOT NULL, "vault_address" text NOT NULL, "validator" text NOT NULL, "queued" numeric NOT NULL, "activated" numeric NOT NULL, CONSTRAINT "PK_1df066562fa706e41ff490333ed" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_15e14891098658f3175934bbc6" ON "bgt_delegation" ("vault_address") `)
+        await db.query(`CREATE TABLE "vault_rewards_claim" ("id" character varying NOT NULL, "vault_address" text NOT NULL, "staking_contract" text NOT NULL, "timestamp" numeric NOT NULL, "transaction_hash" text NOT NULL, CONSTRAINT "PK_740ca627607e40e6c5067b7972e" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_788da7bf94f8b9993e7c214df9" ON "vault_rewards_claim" ("vault_address") `)
+        await db.query(`CREATE INDEX "IDX_afc6f0bbe70ec7053aebf03231" ON "vault_rewards_claim" ("staking_contract") `)
     }
 
     async down(db) {
@@ -47,5 +50,8 @@ module.exports = class Data1723609401402 {
         await db.query(`DROP TABLE "fees"`)
         await db.query(`DROP TABLE "bgt_delegation"`)
         await db.query(`DROP INDEX "public"."IDX_15e14891098658f3175934bbc6"`)
+        await db.query(`DROP TABLE "vault_rewards_claim"`)
+        await db.query(`DROP INDEX "public"."IDX_788da7bf94f8b9993e7c214df9"`)
+        await db.query(`DROP INDEX "public"."IDX_afc6f0bbe70ec7053aebf03231"`)
     }
 }
