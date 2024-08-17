@@ -42,6 +42,7 @@ export const processor = new EvmBatchProcessor()
       honeyVaultAbi.events.Staked.topic,
       honeyVaultAbi.events.Unstaked.topic,
       honeyVaultAbi.events.Fees.topic,
+      honeyVaultAbi.events.RewardsClaimed.topic,
     ],
     transaction: true,
   })
