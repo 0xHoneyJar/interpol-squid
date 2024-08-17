@@ -31,7 +31,7 @@ export const processor = new EvmBatchProcessor()
   })
   .addLog({
     address: [FACTORY_ADDRESS], // Factory contract address
-    topic0: [factoryAbi.events.NewVault.topic],
+    topic0: [factoryAbi.events.NewLocker.topic],
   })
   .addLog({
     topic0: [

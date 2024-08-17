@@ -15,13 +15,17 @@
       { "name": "_unlocked", "type": "bool", "internalType": "bool" }
     ],
     "outputs": [
-      { "name": "", "type": "address", "internalType": "contract HoneyVault" }
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "contract HoneyLocker"
+      }
     ],
     "stateMutability": "nonpayable"
   },
   {
     "type": "event",
-    "name": "NewVault",
+    "name": "NewLocker",
     "inputs": [
       {
         "name": "owner",
@@ -30,7 +34,7 @@
         "internalType": "address"
       },
       {
-        "name": "vault",
+        "name": "locker",
         "type": "address",
         "indexed": false,
         "internalType": "address"
