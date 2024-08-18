@@ -1,5 +1,5 @@
-module.exports = class Data1723841075219 {
-    name = 'Data1723841075219'
+module.exports = class Data1724012673870 {
+    name = 'Data1724012673870'
 
     async up(db) {
         await db.query(`CREATE TABLE "vault" ("id" character varying NOT NULL, "owner" text NOT NULL, "timestamp" numeric NOT NULL, "address" text NOT NULL, CONSTRAINT "PK_dd0898234c77f9d97585171ac59" PRIMARY KEY ("id"))`)
@@ -26,6 +26,10 @@ module.exports = class Data1723841075219 {
         await db.query(`CREATE TABLE "vault_rewards_claim" ("id" character varying NOT NULL, "vault_address" text NOT NULL, "staking_contract" text NOT NULL, "timestamp" numeric NOT NULL, "transaction_hash" text NOT NULL, CONSTRAINT "PK_740ca627607e40e6c5067b7972e" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_788da7bf94f8b9993e7c214df9" ON "vault_rewards_claim" ("vault_address") `)
         await db.query(`CREATE INDEX "IDX_afc6f0bbe70ec7053aebf03231" ON "vault_rewards_claim" ("staking_contract") `)
+        await db.query(`CREATE TABLE "xkdk_finalized_redeem" ("id" character varying NOT NULL, "vault_address" text NOT NULL, "amount" numeric NOT NULL, "timestamp" numeric NOT NULL, "transaction_hash" text NOT NULL, CONSTRAINT "PK_80cb2645ef932a9eb6a5fad3536" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_a140cadf950493a50a6b8b07ed" ON "xkdk_finalized_redeem" ("vault_address") `)
+        await db.query(`CREATE TABLE "xkdk_redeem" ("id" character varying NOT NULL, "vault_address" text NOT NULL, "x_kodiak_amount" numeric NOT NULL, "kodiak_amount" numeric NOT NULL, "duration" numeric NOT NULL, "timestamp" numeric NOT NULL, "transaction_hash" text NOT NULL, CONSTRAINT "PK_b1e6b980d5ac11f91dc9043001d" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_647c209aeca0ef7ef4d5a02512" ON "xkdk_redeem" ("vault_address") `)
     }
 
     async down(db) {
@@ -53,5 +57,9 @@ module.exports = class Data1723841075219 {
         await db.query(`DROP TABLE "vault_rewards_claim"`)
         await db.query(`DROP INDEX "public"."IDX_788da7bf94f8b9993e7c214df9"`)
         await db.query(`DROP INDEX "public"."IDX_afc6f0bbe70ec7053aebf03231"`)
+        await db.query(`DROP TABLE "xkdk_finalized_redeem"`)
+        await db.query(`DROP INDEX "public"."IDX_a140cadf950493a50a6b8b07ed"`)
+        await db.query(`DROP TABLE "xkdk_redeem"`)
+        await db.query(`DROP INDEX "public"."IDX_647c209aeca0ef7ef4d5a02512"`)
     }
 }

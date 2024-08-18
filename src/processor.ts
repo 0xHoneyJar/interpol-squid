@@ -10,8 +10,9 @@ import { assertNotNull } from "@subsquid/util-internal";
 import * as bgtAbi from "./abi/BGT"; // You'll need to add this ABI
 import * as factoryAbi from "./abi/Factory";
 import * as honeyVaultAbi from "./abi/HoneyVault";
+import * as xkdkAbi from "./abi/XKDK";
 //import * as kodiakAbi from "./abi/Kodiak"; // You'll need to add this ABI
-import { BGT_ADDRESS, FACTORY_ADDRESS } from "./addresses";
+import { BGT_ADDRESS, FACTORY_ADDRESS, XKDK_ADDRESS } from "./addresses";
 
 export const processor = new EvmBatchProcessor()
   .setGateway("https://v2.archive.subsquid.io/network/berachain-bartio")
@@ -54,6 +55,11 @@ export const processor = new EvmBatchProcessor()
       bgtAbi.events.CancelBoost.topic,
       bgtAbi.events.DropBoost.topic,
     ],
+  })
+  .addLog({
+    address: [XKDK_ADDRESS],
+    topic0: [xkdkAbi.events.FinalizeRedeem.topic, xkdkAbi.events.Redeem.topic],
+    transaction: true,
   });
 
 export type Fields = EvmBatchProcessorFields<typeof processor>;

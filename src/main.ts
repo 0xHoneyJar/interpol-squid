@@ -2,6 +2,7 @@ import { TypeormDatabase } from "@subsquid/typeorm-store";
 import * as bgtAbi from "./abi/BGT";
 import * as factoryAbi from "./abi/Factory";
 import * as honeyVaultAbi from "./abi/HoneyVault";
+import * as xkdkAbi from "./abi/XKDK";
 import {
   BGTDelegation,
   Fees,
@@ -15,6 +16,8 @@ import {
   VaultTotalStake,
   VaultUnstake,
   VaultWithdrawal,
+  XKDKFinalizedRedeem,
+  XKDKRedeem,
 } from "./model";
 import { processor } from "./processor";
 
@@ -31,6 +34,8 @@ processor.run(new TypeormDatabase(), async (ctx) => {
     fees: [] as Fees[],
     bgtDelegations: new Map<string, BGTDelegation>(),
     vaultRewardsClaims: [] as VaultRewardsClaim[],
+    xkdkFinalizedRedeems: [] as XKDKFinalizedRedeem[],
+    xkdkRedeems: [] as XKDKRedeem[],
   };
 
   for (const block of ctx.blocks) {
@@ -67,6 +72,10 @@ async function processLog(log: any, block: any, ctx: any, entities: any) {
     await processBGTCancelBoost(log, ctx, entities);
   } else if (bgtAbi.events.DropBoost.is(log)) {
     await processBGTDropBoost(log, ctx, entities);
+  } else if (xkdkAbi.events.Redeem.is(log)) {
+    await processXKDKRedeem(log, block, ctx, entities);
+  } else if (xkdkAbi.events.FinalizeRedeem.is(log)) {
+    await processXKDKFinalizedRedeem(log, block, ctx, entities);
   }
 }
 
@@ -229,6 +238,65 @@ async function processBGTDropBoost(log: any, ctx: any, entities: any) {
   await updateBGTDelegation(sender, validator, 0n, -amount, ctx, entities);
 }
 
+async function processXKDKFinalizedRedeem(
+  log: any,
+  block: any,
+  ctx: any,
+  entities: any
+) {
+  const { userAddress, xKodiakAmount } =
+    xkdkAbi.events.FinalizeRedeem.decode(log);
+
+  console.log("userAddress", userAddress);
+
+  // Check if the userAddress is a vault from entities
+  const isVault = entities.vaults.some(
+    (vault: Vault) => vault.id === userAddress
+  );
+  console.log("isVault", isVault);
+
+  if (isVault) {
+    entities.xkdkFinalizedRedeems.push(
+      new XKDKFinalizedRedeem({
+        id: log.id,
+        vaultAddress: userAddress,
+        amount: xKodiakAmount,
+        timestamp: BigInt(block.header.timestamp),
+        transactionHash: log.transaction?.hash,
+      })
+    );
+  }
+}
+
+async function processXKDKRedeem(
+  log: any,
+  block: any,
+  ctx: any,
+  entities: any
+) {
+  const { userAddress, xKodiakAmount, kodiakAmount, duration } =
+    xkdkAbi.events.Redeem.decode(log);
+
+  // Check if the userAddress is a vault from entities
+  const isVault = entities.vaults.some(
+    (vault: Vault) => vault.id === userAddress
+  );
+
+  if (isVault) {
+    entities.xkdkRedeems.push(
+      new XKDKRedeem({
+        id: log.id,
+        vaultAddress: userAddress,
+        xKodiakAmount: xKodiakAmount,
+        kodiakAmount: kodiakAmount,
+        duration: duration,
+        timestamp: BigInt(block.header.timestamp),
+        transactionHash: log.transaction?.hash,
+      })
+    );
+  }
+}
+
 async function saveEntities(ctx: any, entities: any) {
   await ctx.store.upsert(entities.vaults);
   await ctx.store.upsert(entities.lpTokens);
@@ -241,6 +309,8 @@ async function saveEntities(ctx: any, entities: any) {
   await ctx.store.upsert(entities.fees);
   await ctx.store.upsert(entities.vaultRewardsClaims);
   await ctx.store.upsert(Array.from(entities.bgtDelegations.values()));
+  await ctx.store.upsert(entities.xkdkRedeems);
+  await ctx.store.upsert(entities.xkdkFinalizedRedeems);
 }
 
 async function updateVaultTotalDeposit(

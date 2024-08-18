@@ -90,3 +90,21 @@ type VaultRewardsClaim @entity {
   timestamp: BigInt!
   transactionHash: String!
 }
+
+type XKDKFinalizedRedeem @entity {
+  id: ID!
+  vaultAddress: String! @index
+  amount: BigInt!
+  timestamp: BigInt!
+  transactionHash: String!
+}
+
+type XKDKRedeem @entity {
+  id: ID!
+  vaultAddress: String! @index
+  xKodiakAmount: BigInt!
+  kodiakAmount: BigInt!
+  duration: BigInt!
+  timestamp: BigInt!
+  transactionHash: String!
+}
