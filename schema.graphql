@@ -7,9 +7,14 @@ type Vault @entity {
 
 type LPToken @entity {
   id: ID!
-  address: String!
+  address: String! @index
   name: String
   symbol: String
+  factory: String! @index
+  factoryType: String! @index
+  token0: String! @index
+  token1: String! @index
+  fee: BigInt
 }
 
 type VaultDeposit @entity {

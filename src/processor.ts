@@ -11,8 +11,11 @@ import * as bgtAbi from "./abi/BGT"; // You'll need to add this ABI
 import * as factoryAbi from "./abi/Factory";
 import * as honeyVaultAbi from "./abi/HoneyVault";
 import * as xkdkAbi from "./abi/XKDK";
-//import * as kodiakAbi from "./abi/Kodiak"; // You'll need to add this ABI
-import { BGT_ADDRESS, FACTORY_ADDRESS, XKDK_ADDRESS } from "./addresses";
+import * as kodiakFactoryAbi from "./abi/KodiakV1Factory";
+import * as uniswapV2FactoryAbi from "./abi/UniswapV2Factory";
+import * as uniswapV3FactoryAbi from "./abi/UniswapV3Factory";
+import * as crocSwapDexAbi from "./abi/CrocSwapDex";
+import { BGT_ADDRESS, FACTORY_ADDRESS, XKDK_ADDRESS, KODIAK_FACTORY_V1_ADDRESS, UNISWAP_V2_FACTORY_ADDRESS, UNISWAP_V3_FACTORY_ADDRESS, BEX_FACTORY_ADDRESS } from "./addresses";
 
 export const processor = new EvmBatchProcessor()
   .setGateway("https://v2.archive.subsquid.io/network/berachain-bartio")
@@ -60,6 +63,22 @@ export const processor = new EvmBatchProcessor()
     address: [XKDK_ADDRESS],
     topic0: [xkdkAbi.events.FinalizeRedeem.topic, xkdkAbi.events.Redeem.topic],
     transaction: true,
+  })
+  .addLog({
+    address: [KODIAK_FACTORY_V1_ADDRESS],
+    topic0: [kodiakFactoryAbi.events.PoolCreated.topic],
+  })
+  .addLog({
+    address: [UNISWAP_V2_FACTORY_ADDRESS],
+    topic0: [uniswapV2FactoryAbi.events.PairCreated.topic],
+  })
+  .addLog({
+    address: [UNISWAP_V3_FACTORY_ADDRESS],
+    topic0: [uniswapV3FactoryAbi.events.PoolCreated.topic],
+  })
+  .addLog({
+    address: [BEX_FACTORY_ADDRESS],
+    topic0: [crocSwapDexAbi.events.CrocKnockoutCross.topic],
   });
 
 export type Fields = EvmBatchProcessorFields<typeof processor>;
