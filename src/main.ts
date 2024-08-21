@@ -9,6 +9,7 @@ import {
   VaultRewardsClaim,
   Vault,
   VaultDeposit,
+  VaultRewardsClaim,
   VaultStake,
   VaultTotalDeposit,
   VaultTotalStake,
@@ -42,7 +43,7 @@ processor.run(new TypeormDatabase(), async (ctx) => {
 });
 
 async function processLog(log: any, block: any, ctx: any, entities: any) {
-  if (factoryAbi.events.NewVault.is(log)) {
+  if (factoryAbi.events.NewLocker.is(log)) {
     processNewVault(log, block, entities);
   } else if (honeyVaultAbi.events.Deposited.is(log)) {
     await processDeposit(log, block, ctx, entities);
@@ -70,13 +71,13 @@ async function processLog(log: any, block: any, ctx: any, entities: any) {
 }
 
 function processNewVault(log: any, block: any, entities: any) {
-  const { owner, vault } = factoryAbi.events.NewVault.decode(log);
+  const { owner, locker } = factoryAbi.events.NewLocker.decode(log);
   entities.vaults.push(
     new Vault({
-      id: vault,
+      id: locker,
       owner: owner,
       timestamp: BigInt(block.header.timestamp),
-      address: vault,
+      address: locker,
     })
   );
 }
@@ -97,7 +98,12 @@ async function processDeposit(log: any, block: any, ctx: any, entities: any) {
   await updateVaultTotalDeposit(log.address, token, amount, ctx, entities);
 }
 
-async function processWithdrawal(log: any, block: any, ctx: any, entities: any) {
+async function processWithdrawal(
+  log: any,
+  block: any,
+  ctx: any,
+  entities: any
+) {
   const { token, amount } = honeyVaultAbi.events.Withdrawn.decode(log);
   entities.vaultWithdrawals.push(
     new VaultWithdrawal({
@@ -116,7 +122,9 @@ async function processWithdrawal(log: any, block: any, ctx: any, entities: any) 
 async function processLock(log: any, ctx: any, entities: any) {
   const { token, expiration } = honeyVaultAbi.events.LockedUntil.decode(log);
   const id = log.address + "-" + token;
-  const existingDeposit = entities.vaultTotalDeposits.get(id) || await ctx.store.get(VaultTotalDeposit, id);
+  const existingDeposit =
+    entities.vaultTotalDeposits.get(id) ||
+    (await ctx.store.get(VaultTotalDeposit, id));
   const updatedDeposit = new VaultTotalDeposit({
     ...existingDeposit,
     id: id,
@@ -126,7 +134,8 @@ async function processLock(log: any, ctx: any, entities: any) {
 }
 
 async function processStake(log: any, block: any, ctx: any, entities: any) {
-  const { stakingContract, token, amount } = honeyVaultAbi.events.Staked.decode(log);
+  const { stakingContract, token, amount } =
+    honeyVaultAbi.events.Staked.decode(log);
   entities.vaultStakes.push(
     new VaultStake({
       id: log.id,
@@ -139,11 +148,19 @@ async function processStake(log: any, block: any, ctx: any, entities: any) {
     })
   );
 
-  await updateVaultTotalStake(log.address, token, stakingContract, amount, ctx, entities);
+  await updateVaultTotalStake(
+    log.address,
+    token,
+    stakingContract,
+    amount,
+    ctx,
+    entities
+  );
 }
 
 async function processUnstake(log: any, block: any, ctx: any, entities: any) {
-  const { stakingContract, token, amount } = honeyVaultAbi.events.Unstaked.decode(log);
+  const { stakingContract, token, amount } =
+    honeyVaultAbi.events.Unstaked.decode(log);
   entities.vaultUnstakes.push(
     new VaultUnstake({
       id: log.id,
@@ -156,7 +173,14 @@ async function processUnstake(log: any, block: any, ctx: any, entities: any) {
     })
   );
 
-  await updateVaultTotalStake(log.address, token, stakingContract, -amount, ctx, entities);
+  await updateVaultTotalStake(
+    log.address,
+    token,
+    stakingContract,
+    -amount,
+    ctx,
+    entities
+  );
 }
 
 function processFees(log: any, entities: any) {
@@ -219,9 +243,17 @@ async function saveEntities(ctx: any, entities: any) {
   await ctx.store.upsert(Array.from(entities.bgtDelegations.values()));
 }
 
-async function updateVaultTotalDeposit(vaultAddress: string, token: string, amount: bigint, ctx: any, entities: any) {
+async function updateVaultTotalDeposit(
+  vaultAddress: string,
+  token: string,
+  amount: bigint,
+  ctx: any,
+  entities: any
+) {
   const id = vaultAddress + "-" + token;
-  const existingDeposit = entities.vaultTotalDeposits.get(id) || await ctx.store.get(VaultTotalDeposit, id);
+  const existingDeposit =
+    entities.vaultTotalDeposits.get(id) ||
+    (await ctx.store.get(VaultTotalDeposit, id));
   const updatedDeposit = new VaultTotalDeposit({
     id: id,
     vaultAddress: vaultAddress,
@@ -232,9 +264,18 @@ async function updateVaultTotalDeposit(vaultAddress: string, token: string, amou
   entities.vaultTotalDeposits.set(id, updatedDeposit);
 }
 
-async function updateVaultTotalStake(vaultAddress: string, token: string, stakingContract: string, amount: bigint, ctx: any, entities: any) {
+async function updateVaultTotalStake(
+  vaultAddress: string,
+  token: string,
+  stakingContract: string,
+  amount: bigint,
+  ctx: any,
+  entities: any
+) {
   const id = vaultAddress + "-" + token + "-" + stakingContract;
-  const existingStake = entities.vaultTotalStakes.get(id) || await ctx.store.get(VaultTotalStake, id);
+  const existingStake =
+    entities.vaultTotalStakes.get(id) ||
+    (await ctx.store.get(VaultTotalStake, id));
   const updatedStake = new VaultTotalStake({
     id,
     vaultAddress,
@@ -245,9 +286,17 @@ async function updateVaultTotalStake(vaultAddress: string, token: string, stakin
   entities.vaultTotalStakes.set(id, updatedStake);
 }
 
-async function updateBGTDelegation(vaultAddress: string, validator: string, queuedChange: bigint, activatedChange: bigint, ctx: any, entities: any) {
+async function updateBGTDelegation(
+  vaultAddress: string,
+  validator: string,
+  queuedChange: bigint,
+  activatedChange: bigint,
+  ctx: any,
+  entities: any
+) {
   const id = vaultAddress + "-" + validator;
-  const existingDelegation = entities.bgtDelegations.get(id) || await ctx.store.get(BGTDelegation, id);
+  const existingDelegation =
+    entities.bgtDelegations.get(id) || (await ctx.store.get(BGTDelegation, id));
   const updatedDelegation = new BGTDelegation({
     id,
     vaultAddress,
