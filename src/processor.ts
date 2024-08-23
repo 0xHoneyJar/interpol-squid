@@ -28,7 +28,7 @@ export const processor = new EvmBatchProcessor()
     },
   })
   .setBlockRange({
-    from: 2209030, // deployment block of factory
+    from: 3040843, // deployment block of factory
   })
   .addLog({
     address: [FACTORY_ADDRESS], // Factory contract address

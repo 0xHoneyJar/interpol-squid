@@ -20,4 +20,7 @@ export class Fees {
 
     @StringColumn_({nullable: false})
     transactionHash!: string
+
+    @BigIntColumn_({nullable: false})
+    timestamp!: bigint
 }

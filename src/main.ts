@@ -10,7 +10,6 @@ import {
   VaultRewardsClaim,
   Vault,
   VaultDeposit,
-  VaultRewardsClaim,
   VaultStake,
   VaultTotalDeposit,
   VaultTotalStake,
@@ -61,7 +60,7 @@ async function processLog(log: any, block: any, ctx: any, entities: any) {
   } else if (honeyVaultAbi.events.Unstaked.is(log)) {
     await processUnstake(log, block, ctx, entities);
   } else if (honeyVaultAbi.events.Fees.is(log)) {
-    processFees(log, entities);
+    processFees(log, block, entities);
   } else if (honeyVaultAbi.events.RewardsClaimed.is(log)) {
     await processRewardsClaim(log, block, entities);
   } else if (bgtAbi.events.QueueBoost.is(log)) {
@@ -192,7 +191,7 @@ async function processUnstake(log: any, block: any, ctx: any, entities: any) {
   );
 }
 
-function processFees(log: any, entities: any) {
+function processFees(log: any, block: any, entities: any) {
   const { referral, token, amount } = honeyVaultAbi.events.Fees.decode(log);
   entities.fees.push(
     new Fees({
@@ -201,6 +200,7 @@ function processFees(log: any, entities: any) {
       amount,
       referral,
       transactionHash: log.transaction?.hash,
+      timestamp: BigInt(block.header.timestamp),
     })
   );
 }

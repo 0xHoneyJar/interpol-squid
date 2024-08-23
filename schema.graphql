@@ -73,6 +73,7 @@ type Fees @entity {
   tokenAddress: String!
   amount: BigInt!
   transactionHash: String!
+  timestamp: BigInt!
 }
 
 type BGTDelegation @entity {
