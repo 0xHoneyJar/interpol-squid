@@ -109,3 +109,10 @@ type XKDKRedeem @entity {
   timestamp: BigInt!
   transactionHash: String!
 }
+
+type VaultBalance @entity {
+  id: ID!
+  vaultAddress: String! @index
+  tokenAddress: String! @index
+  balance: BigInt!
+}

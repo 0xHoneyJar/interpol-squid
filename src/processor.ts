@@ -12,6 +12,7 @@ import * as factoryAbi from "./abi/Factory";
 import * as honeyVaultAbi from "./abi/HoneyVault";
 import * as xkdkAbi from "./abi/XKDK";
 //import * as kodiakAbi from "./abi/Kodiak"; // You'll need to add this ABI
+import * as erc20Abi from "./abi/ERC20"; // You'll need to add this ABI
 import { BGT_ADDRESS, FACTORY_ADDRESS, XKDK_ADDRESS } from "./addresses";
 
 export const processor = new EvmBatchProcessor()
@@ -44,6 +45,7 @@ export const processor = new EvmBatchProcessor()
       honeyVaultAbi.events.Unstaked.topic,
       honeyVaultAbi.events.Fees.topic,
       honeyVaultAbi.events.RewardsClaimed.topic,
+      honeyVaultAbi.events.OwnershipTransferred.topic,
     ],
     transaction: true,
   })
@@ -60,6 +62,9 @@ export const processor = new EvmBatchProcessor()
     address: [XKDK_ADDRESS],
     topic0: [xkdkAbi.events.FinalizeRedeem.topic, xkdkAbi.events.Redeem.topic],
     transaction: true,
+  })
+  .addLog({
+    topic0: [erc20Abi.events.Transfer.topic],
   });
 
 export type Fields = EvmBatchProcessorFields<typeof processor>;
