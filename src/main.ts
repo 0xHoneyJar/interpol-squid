@@ -22,7 +22,7 @@ import { processor } from "./processor";
 
 processor.run(new TypeormDatabase(), async (ctx) => {
   const entities = {
-    vaults: [] as Vault[],
+    vaults: new Map<string, Vault>(),
     lpTokens: [] as LPToken[],
     vaultDeposits: [] as VaultDeposit[],
     vaultWithdrawals: [] as VaultWithdrawal[],
@@ -51,6 +51,8 @@ async function processLog(log: any, block: any, ctx: any, entities: any) {
     processNewVault(log, block, entities);
   } else if (honeyVaultAbi.events.Deposited.is(log)) {
     await processDeposit(log, block, ctx, entities);
+  } else if (honeyVaultAbi.events.OwnershipTransferred.is(log)) {
+    processOwnershipTransfer(log, entities);
   } else if (honeyVaultAbi.events.Withdrawn.is(log)) {
     await processWithdrawal(log, block, ctx, entities);
   } else if (honeyVaultAbi.events.LockedUntil.is(log)) {
@@ -80,14 +82,25 @@ async function processLog(log: any, block: any, ctx: any, entities: any) {
 
 function processNewVault(log: any, block: any, entities: any) {
   const { owner, locker } = factoryAbi.events.NewLocker.decode(log);
-  entities.vaults.push(
-    new Vault({
-      id: locker,
-      owner: owner,
-      timestamp: BigInt(block.header.timestamp),
-      address: locker,
-    })
-  );
+  const id = locker;
+  const vault = new Vault({
+    id: id,
+    owner,
+    timestamp: BigInt(block.header.timestamp),
+    address: locker,
+  });
+  entities.vaults.set(id, vault);
+}
+
+function processOwnershipTransfer(log: any, entities: any) {
+  const { oldOwner, newOwner } =
+    honeyVaultAbi.events.OwnershipTransferred.decode(log);
+  const id = log.address;
+  const vault = entities.vaults.get(id);
+  if (vault) {
+    vault.owner = newOwner;
+    entities.vaults.set(id, vault);
+  }
 }
 
 async function processDeposit(log: any, block: any, ctx: any, entities: any) {
@@ -250,9 +263,7 @@ async function processXKDKFinalizedRedeem(
   console.log("userAddress", userAddress);
 
   // Check if the userAddress is a vault from entities
-  const isVault = entities.vaults.some(
-    (vault: Vault) => vault.id === userAddress
-  );
+  const isVault = entities.vaults.has(userAddress);
   console.log("isVault", isVault);
 
   if (isVault) {
@@ -278,9 +289,7 @@ async function processXKDKRedeem(
     xkdkAbi.events.Redeem.decode(log);
 
   // Check if the userAddress is a vault from entities
-  const isVault = entities.vaults.some(
-    (vault: Vault) => vault.id === userAddress
-  );
+  const isVault = entities.vaults.has(userAddress);
 
   if (isVault) {
     entities.xkdkRedeems.push(
@@ -298,7 +307,7 @@ async function processXKDKRedeem(
 }
 
 async function saveEntities(ctx: any, entities: any) {
-  await ctx.store.upsert(entities.vaults);
+  await ctx.store.upsert(Array.from(entities.vaults.values()));
   await ctx.store.upsert(entities.lpTokens);
   await ctx.store.upsert(entities.vaultDeposits);
   await ctx.store.upsert(entities.vaultWithdrawals);
