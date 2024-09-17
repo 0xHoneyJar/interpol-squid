@@ -10,7 +10,6 @@ import * as honeyVaultAbi from "./abi/HoneyVault";
 import * as xkdkAbi from "./abi/XKDK";
 import {
   BGTDelegation,
-  Fees,
   Vault,
   VaultBalance,
   VaultDeposit,
@@ -58,8 +57,6 @@ async function processLog(log: Log, block: any, mctx: MappingContext) {
     await processStake(log, block, mctx);
   } else if (honeyVaultAbi.events.Unstaked.is(log)) {
     await processUnstake(log, block, mctx);
-  } else if (honeyVaultAbi.events.Fees.is(log)) {
-    processFees(log, block, mctx);
   } else if (honeyVaultAbi.events.RewardsClaimed.is(log)) {
     await processRewardsClaim(log, block, mctx);
   } else if (bgtAbi.events.QueueBoost.is(log)) {
@@ -195,22 +192,6 @@ async function processUnstake(log: Log, block: any, mctx: MappingContext) {
     -amount,
     mctx
   );
-}
-
-function processFees(log: Log, block: any, mctx: MappingContext) {
-  const { referral, token, amount } = honeyVaultAbi.events.Fees.decode(log);
-  mctx.queue.push(async () => {
-    await mctx.store.upsert(
-      new Fees({
-        id: log.id,
-        tokenAddress: token,
-        amount,
-        referral,
-        transactionHash: log.transaction?.hash,
-        timestamp: BigInt(block.header.timestamp),
-      })
-    );
-  });
 }
 
 async function processRewardsClaim(log: Log, block: any, mctx: MappingContext) {

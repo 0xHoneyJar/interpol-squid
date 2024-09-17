@@ -1,6 +1,7 @@
 type Vault @entity {
   id: ID!
   owner: String! @index
+  treasury: String!
   timestamp: BigInt!
   address: String!
 }

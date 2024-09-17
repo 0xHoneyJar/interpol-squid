@@ -7,7 +7,7 @@ export const events = {
 }
 
 export const functions = {
-    clone: fun("0xb1dc8ce3", "clone(address,address,bool)", {"_owner": p.address, "_referral": p.address, "_unlocked": p.bool}, p.address),
+    clone: fun("0xe4a4e486", "clone(address,address)", {"_owner": p.address, "_referral": p.address}, p.address),
 }
 
 export class Contract extends ContractBase {
