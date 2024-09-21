@@ -2,7 +2,17 @@ import { TypeormDatabase } from "@subsquid/typeorm-store";
 import * as bgtAbi from "./abi/BGT";
 import * as factoryAbi from "./abi/Factory";
 import * as honeyVaultAbi from "./abi/HoneyVault";
+import * as kodiakFactoryAbi from "./abi/KodiakV1Factory";
+import * as uniswapV2FactoryAbi from "./abi/UniswapV2Factory";
+import * as uniswapV3FactoryAbi from "./abi/UniswapV3Factory";
 import * as xkdkAbi from "./abi/XKDK";
+import * as crocSwapDexAbi from "./abi/CrocSwapDex";
+import {
+  KODIAK_FACTORY_V1_ADDRESS,
+  UNISWAP_V2_FACTORY_ADDRESS,
+  UNISWAP_V3_FACTORY_ADDRESS,
+  BEX_FACTORY_ADDRESS,
+} from "./addresses";
 import {
   BGTDelegation,
   Fees,
@@ -77,6 +87,14 @@ async function processLog(log: any, block: any, ctx: any, entities: any) {
     await processXKDKRedeem(log, block, ctx, entities);
   } else if (xkdkAbi.events.FinalizeRedeem.is(log)) {
     await processXKDKFinalizedRedeem(log, block, ctx, entities);
+  } else if (kodiakFactoryAbi.events.PoolCreated.is(log)) {
+    await processKodiakPoolCreated(log, ctx, entities);
+  } else if (uniswapV2FactoryAbi.events.PairCreated.is(log)) {
+    await processUniswapV2PairCreated(log, ctx, entities);
+  } else if (uniswapV3FactoryAbi.events.PoolCreated.is(log)) {
+    await processUniswapV3PoolCreated(log, ctx, entities);
+  } else if (crocSwapDexAbi.events.CrocKnockoutCross.is(log)) {
+    await processCrocSwapDexPoolCreated(log, block, ctx, entities);
   }
 }
 
@@ -304,6 +322,71 @@ async function processXKDKRedeem(
       })
     );
   }
+}
+
+async function processKodiakPoolCreated(log: any, ctx: any, entities: any) {
+  const { uniPool, pool } = kodiakFactoryAbi.events.PoolCreated.decode(log);
+  entities.lpTokens.push(
+    new LPToken({
+      id: pool,
+      address: pool,
+      factory: KODIAK_FACTORY_V1_ADDRESS,
+      factoryType: "KodiakV1",
+      token0: uniPool, // This might need adjustment based on how Kodiak stores token addresses
+      token1: "", // This needs to be retrieved from the uniPool contract
+      fee: BigInt(0), // Kodiak pools might not have a fee parameter
+    })
+  );
+}
+
+async function processUniswapV2PairCreated(log: any, ctx: any, entities: any) {
+  const { token0, token1, pair } =
+    uniswapV2FactoryAbi.events.PairCreated.decode(log);
+  entities.lpTokens.push(
+    new LPToken({
+      id: pair,
+      address: pair,
+      factory: UNISWAP_V2_FACTORY_ADDRESS,
+      factoryType: "UniswapV2",
+      token0: token0,
+      token1: token1,
+      fee: BigInt(3000), // UniswapV2 uses a fixed 0.3% fee
+    })
+  );
+}
+
+async function processUniswapV3PoolCreated(log: any, ctx: any, entities: any) {
+  const { token0, token1, fee, pool } =
+    uniswapV3FactoryAbi.events.PoolCreated.decode(log);
+  entities.lpTokens.push(
+    new LPToken({
+      id: pool,
+      address: pool,
+      factory: UNISWAP_V3_FACTORY_ADDRESS,
+      factoryType: "UniswapV3",
+      token0: token0,
+      token1: token1,
+      fee: BigInt(fee),
+    })
+  );
+}
+
+async function processCrocSwapDexPoolCreated(log: any, block: any, ctx: any, entities: any) {
+  const { pool } = crocSwapDexAbi.events.CrocKnockoutCross.decode(log);
+  
+  // CrocSwapDex doesn't provide token addresses in the event, so we'll use the pool address as both token0 and token1
+  // You might want to fetch the actual token addresses using an RPC call if needed
+  entities.lpTokens.push(
+    new LPToken({
+      id: pool,
+      address: pool,
+      factory: BEX_FACTORY_ADDRESS,
+      factoryType: 'CrocSwapDex',
+      token0: pool,
+      token1: pool,
+      fee: BigInt(0), // CrocSwapDex might have a different fee structure, adjust if necessary
+    })
+  );
 }
 
 async function saveEntities(ctx: any, entities: any) {
