@@ -13,6 +13,9 @@ export class Vault {
     @StringColumn_({nullable: false})
     owner!: string
 
+    @StringColumn_({nullable: true})
+    treasury!: string | undefined | null
+
     @BigIntColumn_({nullable: false})
     timestamp!: bigint
 

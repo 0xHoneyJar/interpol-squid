@@ -1,8 +1,8 @@
-module.exports = class Data1726376197197 {
-    name = 'Data1726376197197'
+module.exports = class Data1726894107296 {
+    name = 'Data1726894107296'
 
     async up(db) {
-        await db.query(`CREATE TABLE "vault" ("id" character varying NOT NULL, "owner" text NOT NULL, "timestamp" numeric NOT NULL, "address" text NOT NULL, CONSTRAINT "PK_dd0898234c77f9d97585171ac59" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "vault" ("id" character varying NOT NULL, "owner" text NOT NULL, "treasury" text, "timestamp" numeric NOT NULL, "address" text NOT NULL, CONSTRAINT "PK_dd0898234c77f9d97585171ac59" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_fcb1371031401437ab3fe5db8a" ON "vault" ("owner") `)
         await db.query(`CREATE TABLE "lp_token" ("id" character varying NOT NULL, "address" text NOT NULL, "name" text, "symbol" text, CONSTRAINT "PK_3737dbc5233b14a02a3756d2597" PRIMARY KEY ("id"))`)
         await db.query(`CREATE TABLE "vault_deposit" ("id" character varying NOT NULL, "vault_address" text NOT NULL, "token_address" text NOT NULL, "amount" numeric NOT NULL, "timestamp" numeric NOT NULL, "lock_expiration" numeric, "transaction_hash" text NOT NULL, CONSTRAINT "PK_eb436a184ae6cfb4f8f1ae05994" PRIMARY KEY ("id"))`)
