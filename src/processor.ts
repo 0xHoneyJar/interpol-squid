@@ -13,7 +13,7 @@ import * as honeyVaultAbi from "./abi/HoneyVault";
 import * as xkdkAbi from "./abi/XKDK";
 //import * as kodiakAbi from "./abi/Kodiak"; // You'll need to add this ABI
 import * as erc20Abi from "./abi/ERC20"; // You'll need to add this ABI
-import { BGT_ADDRESS, FACTORY_ADDRESS, XKDK_ADDRESS } from "./addresses";
+import { BGT_ADDRESS, FACTORY_ADDRESSES, XKDK_ADDRESS } from "./addresses";
 
 export const processor = new EvmBatchProcessor()
   .setGateway("https://v2.archive.subsquid.io/network/berachain-bartio")
@@ -32,7 +32,7 @@ export const processor = new EvmBatchProcessor()
     from: 4797717, // deployment block of factory
   })
   .addLog({
-    address: [FACTORY_ADDRESS], // Factory contract address
+    address: FACTORY_ADDRESSES, // Factory contract address
     topic0: [factoryAbi.events.NewLocker.topic],
   })
   .addLog({
