@@ -1,6 +1,7 @@
 type Vault @entity {
   id: ID!
   owner: String! @index
+  treasury: String
   timestamp: BigInt!
   address: String!
 }
@@ -108,4 +109,11 @@ type XKDKRedeem @entity {
   duration: BigInt!
   timestamp: BigInt!
   transactionHash: String!
+}
+
+type VaultBalance @entity {
+  id: ID!
+  vaultAddress: String! @index
+  tokenAddress: String! @index
+  balance: BigInt!
 }

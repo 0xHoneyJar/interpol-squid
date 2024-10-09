@@ -1,8 +1,8 @@
-module.exports = class Data1724012673870 {
-    name = 'Data1724012673870'
+module.exports = class Data1726894107296 {
+    name = 'Data1726894107296'
 
     async up(db) {
-        await db.query(`CREATE TABLE "vault" ("id" character varying NOT NULL, "owner" text NOT NULL, "timestamp" numeric NOT NULL, "address" text NOT NULL, CONSTRAINT "PK_dd0898234c77f9d97585171ac59" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "vault" ("id" character varying NOT NULL, "owner" text NOT NULL, "treasury" text, "timestamp" numeric NOT NULL, "address" text NOT NULL, CONSTRAINT "PK_dd0898234c77f9d97585171ac59" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_fcb1371031401437ab3fe5db8a" ON "vault" ("owner") `)
         await db.query(`CREATE TABLE "lp_token" ("id" character varying NOT NULL, "address" text NOT NULL, "name" text, "symbol" text, CONSTRAINT "PK_3737dbc5233b14a02a3756d2597" PRIMARY KEY ("id"))`)
         await db.query(`CREATE TABLE "vault_deposit" ("id" character varying NOT NULL, "vault_address" text NOT NULL, "token_address" text NOT NULL, "amount" numeric NOT NULL, "timestamp" numeric NOT NULL, "lock_expiration" numeric, "transaction_hash" text NOT NULL, CONSTRAINT "PK_eb436a184ae6cfb4f8f1ae05994" PRIMARY KEY ("id"))`)
@@ -20,7 +20,7 @@ module.exports = class Data1724012673870 {
         await db.query(`CREATE TABLE "vault_total_stake" ("id" character varying NOT NULL, "vault_address" text NOT NULL, "token_address" text NOT NULL, "staking_contract" text NOT NULL, "amount" numeric NOT NULL, CONSTRAINT "PK_3d10d692393b8c8998bc637cec4" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_ea08c3c51a607ff4c348d3be9e" ON "vault_total_stake" ("vault_address") `)
         await db.query(`CREATE INDEX "IDX_312125dee471881466c261cac7" ON "vault_total_stake" ("staking_contract") `)
-        await db.query(`CREATE TABLE "fees" ("id" character varying NOT NULL, "referral" text NOT NULL, "token_address" text NOT NULL, "amount" numeric NOT NULL, "transaction_hash" text NOT NULL, CONSTRAINT "PK_97f3a1b1b8ee5674fd4da93f461" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "fees" ("id" character varying NOT NULL, "referral" text NOT NULL, "token_address" text NOT NULL, "amount" numeric NOT NULL, "transaction_hash" text NOT NULL, "timestamp" numeric NOT NULL, CONSTRAINT "PK_97f3a1b1b8ee5674fd4da93f461" PRIMARY KEY ("id"))`)
         await db.query(`CREATE TABLE "bgt_delegation" ("id" character varying NOT NULL, "vault_address" text NOT NULL, "validator" text NOT NULL, "queued" numeric NOT NULL, "activated" numeric NOT NULL, CONSTRAINT "PK_1df066562fa706e41ff490333ed" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_15e14891098658f3175934bbc6" ON "bgt_delegation" ("vault_address") `)
         await db.query(`CREATE TABLE "vault_rewards_claim" ("id" character varying NOT NULL, "vault_address" text NOT NULL, "staking_contract" text NOT NULL, "timestamp" numeric NOT NULL, "transaction_hash" text NOT NULL, CONSTRAINT "PK_740ca627607e40e6c5067b7972e" PRIMARY KEY ("id"))`)
@@ -30,6 +30,9 @@ module.exports = class Data1724012673870 {
         await db.query(`CREATE INDEX "IDX_a140cadf950493a50a6b8b07ed" ON "xkdk_finalized_redeem" ("vault_address") `)
         await db.query(`CREATE TABLE "xkdk_redeem" ("id" character varying NOT NULL, "vault_address" text NOT NULL, "x_kodiak_amount" numeric NOT NULL, "kodiak_amount" numeric NOT NULL, "duration" numeric NOT NULL, "timestamp" numeric NOT NULL, "transaction_hash" text NOT NULL, CONSTRAINT "PK_b1e6b980d5ac11f91dc9043001d" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_647c209aeca0ef7ef4d5a02512" ON "xkdk_redeem" ("vault_address") `)
+        await db.query(`CREATE TABLE "vault_balance" ("id" character varying NOT NULL, "vault_address" text NOT NULL, "token_address" text NOT NULL, "balance" numeric NOT NULL, CONSTRAINT "PK_f974eec66e2644bc85e444fd56a" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_2b990f62a5d193e8e2e78d3901" ON "vault_balance" ("vault_address") `)
+        await db.query(`CREATE INDEX "IDX_6a8f7fa504000c9b16c69e7635" ON "vault_balance" ("token_address") `)
     }
 
     async down(db) {
@@ -61,5 +64,8 @@ module.exports = class Data1724012673870 {
         await db.query(`DROP INDEX "public"."IDX_a140cadf950493a50a6b8b07ed"`)
         await db.query(`DROP TABLE "xkdk_redeem"`)
         await db.query(`DROP INDEX "public"."IDX_647c209aeca0ef7ef4d5a02512"`)
+        await db.query(`DROP TABLE "vault_balance"`)
+        await db.query(`DROP INDEX "public"."IDX_2b990f62a5d193e8e2e78d3901"`)
+        await db.query(`DROP INDEX "public"."IDX_6a8f7fa504000c9b16c69e7635"`)
     }
 }
