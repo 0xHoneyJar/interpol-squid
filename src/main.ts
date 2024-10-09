@@ -86,9 +86,9 @@ function processNewVault(log: Log, block: any, mctx: MappingContext) {
       () =>
         new Vault({
           id: locker.toLowerCase(),
-          owner: owner,
+          owner: owner.toLowerCase(),
           timestamp: BigInt(block.header.timestamp),
-          address: locker,
+          address: locker.toLowerCase(),
         })
     );
   });
@@ -100,8 +100,8 @@ async function processDeposit(log: Log, block: any, mctx: MappingContext) {
     await mctx.store.upsert(
       new VaultDeposit({
         id: log.id,
-        vaultAddress: log.address,
-        tokenAddress: token,
+        vaultAddress: log.address.toLowerCase(),
+        tokenAddress: token.toLowerCase(),
         amount: amount,
         timestamp: BigInt(block.header.timestamp),
         transactionHash: log.transaction?.hash,
@@ -117,8 +117,8 @@ async function processWithdrawal(log: Log, block: any, mctx: MappingContext) {
     await mctx.store.upsert(
       new VaultWithdrawal({
         id: log.id,
-        vaultAddress: log.address,
-        tokenAddress: token,
+        vaultAddress: log.address.toLowerCase(),
+        tokenAddress: token.toLowerCase(),
         amount: amount,
         timestamp: BigInt(block.header.timestamp),
         transactionHash: log.transaction?.hash,
@@ -151,9 +151,9 @@ async function processStake(log: Log, block: any, mctx: MappingContext) {
     await mctx.store.upsert(
       new VaultStake({
         id: log.id,
-        vaultAddress: log.address,
-        tokenAddress: token,
-        stakingContract,
+        vaultAddress: log.address.toLowerCase(),
+        tokenAddress: token.toLowerCase(),
+        stakingContract: stakingContract.toLowerCase(),
         amount,
         timestamp: BigInt(block.header.timestamp),
         transactionHash: log.transaction?.hash,
@@ -176,9 +176,9 @@ async function processUnstake(log: Log, block: any, mctx: MappingContext) {
     await mctx.store.upsert(
       new VaultUnstake({
         id: log.id,
-        vaultAddress: log.address,
-        tokenAddress: token,
-        stakingContract,
+        vaultAddress: log.address.toLowerCase(),
+        tokenAddress: token.toLowerCase(),
+        stakingContract: stakingContract.toLowerCase(),
         amount,
         timestamp: BigInt(block.header.timestamp),
         transactionHash: log.transaction?.hash,
@@ -186,9 +186,9 @@ async function processUnstake(log: Log, block: any, mctx: MappingContext) {
     );
   });
   await updateVaultTotalStake(
-    log.address,
-    token,
-    stakingContract,
+    log.address.toLowerCase(),
+    token.toLowerCase(),
+    stakingContract.toLowerCase(),
     -amount,
     mctx
   );
@@ -200,8 +200,8 @@ async function processRewardsClaim(log: Log, block: any, mctx: MappingContext) {
     await mctx.store.upsert(
       new VaultRewardsClaim({
         id: log.id,
-        vaultAddress: log.address,
-        stakingContract: stakingContract,
+        vaultAddress: log.address.toLowerCase(),
+        stakingContract: stakingContract.toLowerCase(),
         timestamp: BigInt(block.header.timestamp),
         transactionHash: log.transaction?.hash,
       })
@@ -211,35 +211,59 @@ async function processRewardsClaim(log: Log, block: any, mctx: MappingContext) {
 
 async function processBGTQueueBoost(log: Log, mctx: MappingContext) {
   const { sender, validator, amount } = bgtAbi.events.QueueBoost.decode(log);
-  await updateBGTDelegation(sender, validator, amount, 0n, mctx);
+  await updateBGTDelegation(
+    sender.toLowerCase(),
+    validator.toLowerCase(),
+    amount,
+    0n,
+    mctx
+  );
 }
 
 async function processBGTActivateBoost(log: Log, mctx: MappingContext) {
   const { sender, validator, amount } = bgtAbi.events.ActivateBoost.decode(log);
-  await updateBGTDelegation(sender, validator, -amount, amount, mctx);
+  await updateBGTDelegation(
+    sender.toLowerCase(),
+    validator.toLowerCase(),
+    -amount,
+    amount,
+    mctx
+  );
 }
 
 async function processBGTCancelBoost(log: Log, mctx: MappingContext) {
   const { sender, validator, amount } = bgtAbi.events.CancelBoost.decode(log);
-  await updateBGTDelegation(sender, validator, -amount, 0n, mctx);
+  await updateBGTDelegation(
+    sender.toLowerCase(),
+    validator.toLowerCase(),
+    -amount,
+    0n,
+    mctx
+  );
 }
 
 async function processBGTDropBoost(log: Log, mctx: MappingContext) {
   const { sender, validator, amount } = bgtAbi.events.DropBoost.decode(log);
-  await updateBGTDelegation(sender, validator, 0n, -amount, mctx);
+  await updateBGTDelegation(
+    sender.toLowerCase(),
+    validator.toLowerCase(),
+    0n,
+    -amount,
+    mctx
+  );
 }
 
 async function processOwnershipTransferred(log: Log, mctx: MappingContext) {
   const { oldOwner, newOwner } =
     honeyVaultAbi.events.OwnershipTransferred.decode(log);
-  mctx.store.defer(Vault, oldOwner.toLowerCase());
+  mctx.store.defer(Vault, log.address.toLowerCase());
   mctx.queue.push(async () => {
-    const vault = await mctx.store.get(Vault, oldOwner.toLowerCase());
+    const vault = await mctx.store.get(Vault, log.address.toLowerCase());
     if (vault) {
       await mctx.store.upsert(
         new Vault({
-          id: log.address,
-          owner: newOwner,
+          id: log.address.toLowerCase(),
+          owner: newOwner.toLowerCase(),
         })
       );
     }
@@ -253,14 +277,14 @@ async function processXKDKFinalizedRedeem(
 ) {
   const { userAddress, xKodiakAmount } =
     xkdkAbi.events.FinalizeRedeem.decode(log);
-  mctx.store.defer(Vault, userAddress.toLowerCase());
+  mctx.store.defer(Vault, log.address.toLowerCase());
   mctx.queue.push(async () => {
-    const isVault = await mctx.store.get(Vault, userAddress.toLowerCase());
+    const isVault = await mctx.store.get(Vault, log.address.toLowerCase());
     if (isVault) {
       await mctx.store.upsert(
         new XKDKFinalizedRedeem({
           id: log.id,
-          vaultAddress: userAddress,
+          vaultAddress: log.address.toLowerCase(),
           amount: xKodiakAmount,
           timestamp: BigInt(block.header.timestamp),
           transactionHash: log.transaction?.hash,
@@ -273,14 +297,14 @@ async function processXKDKFinalizedRedeem(
 async function processXKDKRedeem(log: Log, block: any, mctx: MappingContext) {
   const { userAddress, xKodiakAmount, kodiakAmount, duration } =
     xkdkAbi.events.Redeem.decode(log);
-  mctx.store.defer(Vault, userAddress.toLowerCase());
+  mctx.store.defer(Vault, log.address.toLowerCase());
   mctx.queue.push(async () => {
-    const isVault = await mctx.store.get(Vault, userAddress.toLowerCase());
+    const isVault = await mctx.store.get(Vault, log.address.toLowerCase());
     if (isVault) {
       await mctx.store.upsert(
         new XKDKRedeem({
           id: log.id,
-          vaultAddress: userAddress,
+          vaultAddress: log.address.toLowerCase(),
           xKodiakAmount: xKodiakAmount,
           kodiakAmount: kodiakAmount,
           duration: duration,
@@ -305,14 +329,24 @@ async function processERC20Transfer(
   mctx.queue.push(async () => {
     const isToVault = await mctx.store.get(Vault, to.toLowerCase());
     if (isToVault) {
-      await updateVaultBalance(to, log.address, BigInt(value), mctx);
+      await updateVaultBalance(
+        to.toLowerCase(),
+        log.address.toLowerCase(),
+        BigInt(value),
+        mctx
+      );
     }
   });
 
   mctx.queue.push(async () => {
     const isFromVault = await mctx.store.get(Vault, from.toLowerCase());
     if (isFromVault) {
-      await updateVaultBalance(from, log.address, BigInt(-value), mctx);
+      await updateVaultBalance(
+        from.toLowerCase(),
+        log.address.toLowerCase(),
+        BigInt(-value),
+        mctx
+      );
     }
   });
 }
@@ -323,7 +357,7 @@ async function updateVaultBalance(
   amount: bigint,
   mctx: MappingContext
 ) {
-  const id = `${vaultAddress}-${tokenAddress}`;
+  const id = `${vaultAddress.toLowerCase()}-${tokenAddress.toLowerCase()}`;
   mctx.store.defer(VaultBalance, id);
   mctx.queue.push(async () => {
     const existingBalance = await mctx.store.get(VaultBalance, id);
@@ -331,8 +365,8 @@ async function updateVaultBalance(
     await mctx.store.upsert(
       new VaultBalance({
         id,
-        vaultAddress,
-        tokenAddress,
+        vaultAddress: vaultAddress.toLowerCase(),
+        tokenAddress: tokenAddress.toLowerCase(),
         balance: (existingBalance?.balance || 0n) + amount,
       })
     );
@@ -345,15 +379,15 @@ async function updateVaultTotalDeposit(
   amount: bigint,
   mctx: MappingContext
 ) {
-  const id = vaultAddress + "-" + token;
+  const id = vaultAddress.toLowerCase() + "-" + token.toLowerCase();
   mctx.store.defer(VaultTotalDeposit, id);
   mctx.queue.push(async () => {
     const existingDeposit = await mctx.store.get(VaultTotalDeposit, id);
     await mctx.store.upsert(
       new VaultTotalDeposit({
         id: id,
-        vaultAddress: vaultAddress,
-        tokenAddress: token,
+        vaultAddress: vaultAddress.toLowerCase(),
+        tokenAddress: token.toLowerCase(),
         amount: (existingDeposit?.amount || BigInt(0)) + amount,
         lockExpiration: existingDeposit?.lockExpiration,
       })
@@ -368,16 +402,21 @@ async function updateVaultTotalStake(
   amount: bigint,
   mctx: MappingContext
 ) {
-  const id = vaultAddress + "-" + token + "-" + stakingContract;
+  const id =
+    vaultAddress.toLowerCase() +
+    "-" +
+    token.toLowerCase() +
+    "-" +
+    stakingContract.toLowerCase();
   mctx.store.defer(VaultTotalStake, id);
   mctx.queue.push(async () => {
     const existingStake = await mctx.store.get(VaultTotalStake, id);
     await mctx.store.upsert(
       new VaultTotalStake({
         id,
-        vaultAddress,
-        tokenAddress: token,
-        stakingContract,
+        vaultAddress: vaultAddress.toLowerCase(),
+        tokenAddress: token.toLowerCase(),
+        stakingContract: stakingContract.toLowerCase(),
         amount: (existingStake?.amount || BigInt(0)) + amount,
       })
     );
@@ -391,15 +430,15 @@ async function updateBGTDelegation(
   activatedChange: bigint,
   mctx: MappingContext
 ) {
-  const id = vaultAddress + "-" + validator;
+  const id = vaultAddress.toLowerCase() + "-" + validator.toLowerCase();
   mctx.store.defer(BGTDelegation, id);
   mctx.queue.push(async () => {
     const existingDelegation = await mctx.store.get(BGTDelegation, id);
     await mctx.store.upsert(
       new BGTDelegation({
         id,
-        vaultAddress,
-        validator,
+        vaultAddress: vaultAddress.toLowerCase(),
+        validator: validator.toLowerCase(),
         queued: (existingDelegation?.queued || BigInt(0)) + queuedChange,
         activated:
           (existingDelegation?.activated || BigInt(0)) + activatedChange,
