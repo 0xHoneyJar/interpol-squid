@@ -2,6 +2,15 @@
   { "type": "receive", "stateMutability": "payable" },
   {
     "type": "function",
+    "name": "HONEY_QUEEN",
+    "inputs": [],
+    "outputs": [
+      { "name": "", "type": "address", "internalType": "contract HoneyQueen" }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "activateBoost",
     "inputs": [
       { "name": "_validator", "type": "address", "internalType": "address" }
@@ -44,7 +53,7 @@
         "type": "address",
         "internalType": "address"
       },
-      { "name": "data", "type": "bytes", "internalType": "bytes" }
+      { "name": "_data", "type": "bytes", "internalType": "bytes" }
     ],
     "outputs": [],
     "stateMutability": "nonpayable"
@@ -73,7 +82,7 @@
     "name": "depositAndLock",
     "inputs": [
       { "name": "_LPToken", "type": "address", "internalType": "address" },
-      { "name": "_amount", "type": "uint256", "internalType": "uint256" },
+      { "name": "_amountOrId", "type": "uint256", "internalType": "uint256" },
       { "name": "_expiration", "type": "uint256", "internalType": "uint256" }
     ],
     "outputs": [],
@@ -122,7 +131,12 @@
         "internalType": "address[]"
       },
       {
-        "name": "_newHoneyVault",
+        "name": "_amountsOrIds",
+        "type": "uint256[]",
+        "internalType": "uint256[]"
+      },
+      {
+        "name": "_newHoneyLocker",
         "type": "address",
         "internalType": "address payable"
       }
@@ -170,6 +184,13 @@
   },
   {
     "type": "function",
+    "name": "operator",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "address", "internalType": "address" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "owner",
     "inputs": [],
     "outputs": [
@@ -186,6 +207,13 @@
     "outputs": [
       { "name": "result", "type": "uint256", "internalType": "uint256" }
     ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "recipient",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "address", "internalType": "address" }],
     "stateMutability": "view"
   },
   {
@@ -211,6 +239,37 @@
   },
   {
     "type": "function",
+    "name": "setMigratingVault",
+    "inputs": [
+      {
+        "name": "_migratingVault",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "setOperator",
+    "inputs": [
+      { "name": "_operator", "type": "address", "internalType": "address" }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "setTreasury",
+    "inputs": [
+      { "name": "_treasury", "type": "address", "internalType": "address" }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
     "name": "stake",
     "inputs": [
       { "name": "_LPToken", "type": "address", "internalType": "address" },
@@ -220,26 +279,10 @@
         "internalType": "address"
       },
       { "name": "_amount", "type": "uint256", "internalType": "uint256" },
-      { "name": "data", "type": "bytes", "internalType": "bytes" }
+      { "name": "_data", "type": "bytes", "internalType": "bytes" }
     ],
     "outputs": [],
     "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "staked",
-    "inputs": [
-      { "name": "LPToken", "type": "address", "internalType": "address" },
-      {
-        "name": "stakingContract",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "outputs": [
-      { "name": "balance", "type": "uint256", "internalType": "uint256" }
-    ],
-    "stateMutability": "view"
   },
   {
     "type": "function",
@@ -249,6 +292,13 @@
     ],
     "outputs": [],
     "stateMutability": "payable"
+  },
+  {
+    "type": "function",
+    "name": "treasury",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "address", "internalType": "address" }],
+    "stateMutability": "view"
   },
   {
     "type": "function",
@@ -268,7 +318,7 @@
         "internalType": "address"
       },
       { "name": "_amount", "type": "uint256", "internalType": "uint256" },
-      { "name": "data", "type": "bytes", "internalType": "bytes" }
+      { "name": "_data", "type": "bytes", "internalType": "bytes" }
     ],
     "outputs": [],
     "stateMutability": "nonpayable"
@@ -278,7 +328,7 @@
     "name": "wildcard",
     "inputs": [
       { "name": "_contract", "type": "address", "internalType": "address" },
-      { "name": "data", "type": "bytes", "internalType": "bytes" }
+      { "name": "_data", "type": "bytes", "internalType": "bytes" }
     ],
     "outputs": [],
     "stateMutability": "nonpayable"
@@ -299,7 +349,7 @@
       { "name": "_token", "type": "address", "internalType": "address" },
       { "name": "_id", "type": "uint256", "internalType": "uint256" },
       { "name": "_amount", "type": "uint256", "internalType": "uint256" },
-      { "name": "data", "type": "bytes", "internalType": "bytes" }
+      { "name": "_data", "type": "bytes", "internalType": "bytes" }
     ],
     "outputs": [],
     "stateMutability": "nonpayable"
@@ -355,31 +405,6 @@
   },
   {
     "type": "event",
-    "name": "Fees",
-    "inputs": [
-      {
-        "name": "referral",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      },
-      {
-        "name": "token",
-        "type": "address",
-        "indexed": false,
-        "internalType": "address"
-      },
-      {
-        "name": "amount",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
     "name": "Initialized",
     "inputs": [
       {
@@ -421,13 +446,13 @@
         "internalType": "address"
       },
       {
-        "name": "oldVault",
+        "name": "oldLocker",
         "type": "address",
         "indexed": true,
         "internalType": "address"
       },
       {
-        "name": "newVault",
+        "name": "newLocker",
         "type": "address",
         "indexed": true,
         "internalType": "address"
@@ -565,8 +590,10 @@
   { "type": "error", "name": "AlreadyInitialized", "inputs": [] },
   { "type": "error", "name": "CannotBeLPToken", "inputs": [] },
   { "type": "error", "name": "ClaimRewardsFailed", "inputs": [] },
+  { "type": "error", "name": "EmptyCalldata", "inputs": [] },
   { "type": "error", "name": "ExpirationNotMatching", "inputs": [] },
   { "type": "error", "name": "HasToBeLPToken", "inputs": [] },
+  { "type": "error", "name": "MigrationAlreadySet", "inputs": [] },
   { "type": "error", "name": "MigrationNotEnabled", "inputs": [] },
   { "type": "error", "name": "NewOwnerIsZeroAddress", "inputs": [] },
   { "type": "error", "name": "NoHandoverRequest", "inputs": [] },
@@ -577,5 +604,6 @@
   { "type": "error", "name": "TokenBlocked", "inputs": [] },
   { "type": "error", "name": "Unauthorized", "inputs": [] },
   { "type": "error", "name": "UnstakeFailed", "inputs": [] },
-  { "type": "error", "name": "WildcardFailed", "inputs": [] }
+  { "type": "error", "name": "WildcardFailed", "inputs": [] },
+  { "type": "error", "name": "WrongTargetVaultParameters", "inputs": [] }
 ]

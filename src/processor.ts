@@ -12,7 +12,8 @@ import * as factoryAbi from "./abi/Factory";
 import * as honeyVaultAbi from "./abi/HoneyVault";
 import * as xkdkAbi from "./abi/XKDK";
 //import * as kodiakAbi from "./abi/Kodiak"; // You'll need to add this ABI
-import { BGT_ADDRESS, FACTORY_ADDRESS, XKDK_ADDRESS } from "./addresses";
+import * as erc20Abi from "./abi/ERC20"; // You'll need to add this ABI
+import { BGT_ADDRESS, FACTORY_ADDRESSES, XKDK_ADDRESS } from "./addresses";
 
 export const processor = new EvmBatchProcessor()
   .setGateway("https://v2.archive.subsquid.io/network/berachain-bartio")
@@ -28,10 +29,10 @@ export const processor = new EvmBatchProcessor()
     },
   })
   .setBlockRange({
-    from: 4290191, // deployment block of factory
+    from: 4797717, // deployment block of factory
   })
   .addLog({
-    address: [FACTORY_ADDRESS], // Factory contract address
+    address: FACTORY_ADDRESSES, // Factory contract address
     topic0: [factoryAbi.events.NewLocker.topic],
   })
   .addLog({
@@ -42,8 +43,8 @@ export const processor = new EvmBatchProcessor()
       honeyVaultAbi.events.LockedUntil.topic,
       honeyVaultAbi.events.Staked.topic,
       honeyVaultAbi.events.Unstaked.topic,
-      honeyVaultAbi.events.Fees.topic,
       honeyVaultAbi.events.RewardsClaimed.topic,
+      honeyVaultAbi.events.OwnershipTransferred.topic,
     ],
     transaction: true,
   })
@@ -60,6 +61,9 @@ export const processor = new EvmBatchProcessor()
     address: [XKDK_ADDRESS],
     topic0: [xkdkAbi.events.FinalizeRedeem.topic, xkdkAbi.events.Redeem.topic],
     transaction: true,
+  })
+  .addLog({
+    topic0: [erc20Abi.events.Transfer.topic],
   });
 
 export type Fields = EvmBatchProcessorFields<typeof processor>;

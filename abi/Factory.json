@@ -11,8 +11,7 @@
     "name": "clone",
     "inputs": [
       { "name": "_owner", "type": "address", "internalType": "address" },
-      { "name": "_referral", "type": "address", "internalType": "address" },
-      { "name": "_unlocked", "type": "bool", "internalType": "bool" }
+      { "name": "_referral", "type": "address", "internalType": "address" }
     ],
     "outputs": [
       {
