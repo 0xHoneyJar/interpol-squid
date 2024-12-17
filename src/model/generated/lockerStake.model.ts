@@ -1,8 +1,8 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, StringColumn as StringColumn_, Index as Index_, BigIntColumn as BigIntColumn_} from "@subsquid/typeorm-store"
 
 @Entity_()
-export class VaultRewardsClaim {
-    constructor(props?: Partial<VaultRewardsClaim>) {
+export class LockerStake {
+    constructor(props?: Partial<LockerStake>) {
         Object.assign(this, props)
     }
 
@@ -11,11 +11,17 @@ export class VaultRewardsClaim {
 
     @Index_()
     @StringColumn_({nullable: false})
-    vaultAddress!: string
+    locker!: string
 
     @Index_()
     @StringColumn_({nullable: false})
-    stakingContract!: string
+    vault!: string
+
+    @StringColumn_({nullable: false})
+    token!: string
+
+    @BigIntColumn_({nullable: false})
+    amountOrId!: bigint
 
     @BigIntColumn_({nullable: false})
     timestamp!: bigint

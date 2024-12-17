@@ -1,8 +1,8 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, StringColumn as StringColumn_, Index as Index_, BigIntColumn as BigIntColumn_} from "@subsquid/typeorm-store"
 
 @Entity_()
-export class BGTDelegation {
-    constructor(props?: Partial<BGTDelegation>) {
+export class AdapterUpgraded {
+    constructor(props?: Partial<AdapterUpgraded>) {
         Object.assign(this, props)
     }
 
@@ -14,11 +14,14 @@ export class BGTDelegation {
     locker!: string
 
     @StringColumn_({nullable: false})
-    validator!: string
+    protocol!: string
+
+    @StringColumn_({nullable: false})
+    newImplementation!: string
 
     @BigIntColumn_({nullable: false})
-    queued!: bigint
+    timestamp!: bigint
 
-    @BigIntColumn_({nullable: false})
-    activated!: bigint
+    @StringColumn_({nullable: false})
+    transactionHash!: string
 }
