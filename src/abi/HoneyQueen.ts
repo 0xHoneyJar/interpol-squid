@@ -5,6 +5,7 @@ import type { EventParams as EParams, FunctionArguments, FunctionReturn } from '
 export const events = {
     HoneyQueen__AdapterApproved: event("0x84b1179108b0ec15b78da41642e8b999605f77e054c5d56af81100e181ecfcf8", "HoneyQueen__AdapterApproved(address,address,bool)", {"vault": indexed(p.address), "adapter": p.address, "approved": p.bool}),
     HoneyQueen__AdapterUpgraded: event("0x315bc9f2261351c50ad56e0b82609b120d966fdb64247849c800381c3db0d83b", "HoneyQueen__AdapterUpgraded(string,address,address)", {"protocol": indexed(p.string), "fromLogic": indexed(p.address), "toLogic": p.address}),
+    HoneyQueen__LockerUpgraded: event("0x1c0e11299dfafa76a9d250b113bbf04885ae71eb14278a647d563e7392ccf345", "HoneyQueen__LockerUpgraded(address,address)", {"fromLogic": indexed(p.address), "toLogic": p.address}),
     HoneyQueen__VaultAdapterSet: event("0x174871e097c9a64299198736454f7bf44b9e2887a90602e761e10cdd8dbaee31", "HoneyQueen__VaultAdapterSet(address,address)", {"vault": indexed(p.address), "adapter": p.address}),
     OwnershipHandoverCanceled: event("0xfa7b8eab7da67f412cc9575ed43464468f9bfbae89d1675917346ca6d8fe3c92", "OwnershipHandoverCanceled(address)", {"pendingOwner": indexed(p.address)}),
     OwnershipHandoverRequested: event("0xdbf36a107da19e49527a7176a1babf963b4b0ff8cde35ee35d6cd8f1f9ac7e1d", "OwnershipHandoverRequested(address)", {"pendingOwner": indexed(p.address)}),
@@ -36,11 +37,13 @@ export const functions = {
     setIsRewardToken: fun("0xe69af9a3", "setIsRewardToken(address,bool)", {"token": p.address, "_isRewardToken": p.bool}, ),
     setProtocolFees: fun("0xf69b340b", "setProtocolFees(uint256)", {"_protocolFees": p.uint256}, ),
     setTokenBlocked: fun("0xd71255eb", "setTokenBlocked(address,bool)", {"token": p.address, "blocked": p.bool}, ),
-    setUpgradeOf: fun("0x50e0fd54", "setUpgradeOf(address,address)", {"fromLogic": p.address, "toLogic": p.address}, ),
+    setUpgradeOfAdapter: fun("0xa599b0a8", "setUpgradeOfAdapter(address,address)", {"fromLogic": p.address, "toLogic": p.address}, ),
+    setUpgradeOfLocker: fun("0xe8ce3f71", "setUpgradeOfLocker(address,address)", {"fromLogic": p.address, "toLogic": p.address}, ),
     setVaultForProtocol: fun("0xbf1efc29", "setVaultForProtocol(string,address,address,bool)", {"protocol": p.string, "vault": p.address, "token": p.address, "approved": p.bool}, ),
     tokenOfVault: viewFun("0x2c5b8d17", "tokenOfVault(address)", {"vault": p.address}, p.address),
     transferOwnership: fun("0xf2fde38b", "transferOwnership(address)", {"newOwner": p.address}, ),
-    upgradeOf: viewFun("0x1b9320d1", "upgradeOf(address)", {"fromLogic": p.address}, p.address),
+    upgradeOfAdapter: viewFun("0xe0a7d123", "upgradeOfAdapter(address)", {"fromLogic": p.address}, p.address),
+    upgradeOfLocker: viewFun("0x7c82dfd3", "upgradeOfLocker(address)", {"fromLogic": p.address}, p.address),
 }
 
 export class Contract extends ContractBase {
@@ -105,14 +108,19 @@ export class Contract extends ContractBase {
         return this.eth_call(functions.tokenOfVault, {vault})
     }
 
-    upgradeOf(fromLogic: UpgradeOfParams["fromLogic"]) {
-        return this.eth_call(functions.upgradeOf, {fromLogic})
+    upgradeOfAdapter(fromLogic: UpgradeOfAdapterParams["fromLogic"]) {
+        return this.eth_call(functions.upgradeOfAdapter, {fromLogic})
+    }
+
+    upgradeOfLocker(fromLogic: UpgradeOfLockerParams["fromLogic"]) {
+        return this.eth_call(functions.upgradeOfLocker, {fromLogic})
     }
 }
 
 /// Event types
 export type HoneyQueen__AdapterApprovedEventArgs = EParams<typeof events.HoneyQueen__AdapterApproved>
 export type HoneyQueen__AdapterUpgradedEventArgs = EParams<typeof events.HoneyQueen__AdapterUpgraded>
+export type HoneyQueen__LockerUpgradedEventArgs = EParams<typeof events.HoneyQueen__LockerUpgraded>
 export type HoneyQueen__VaultAdapterSetEventArgs = EParams<typeof events.HoneyQueen__VaultAdapterSet>
 export type OwnershipHandoverCanceledEventArgs = EParams<typeof events.OwnershipHandoverCanceled>
 export type OwnershipHandoverRequestedEventArgs = EParams<typeof events.OwnershipHandoverRequested>
@@ -191,8 +199,11 @@ export type SetProtocolFeesReturn = FunctionReturn<typeof functions.setProtocolF
 export type SetTokenBlockedParams = FunctionArguments<typeof functions.setTokenBlocked>
 export type SetTokenBlockedReturn = FunctionReturn<typeof functions.setTokenBlocked>
 
-export type SetUpgradeOfParams = FunctionArguments<typeof functions.setUpgradeOf>
-export type SetUpgradeOfReturn = FunctionReturn<typeof functions.setUpgradeOf>
+export type SetUpgradeOfAdapterParams = FunctionArguments<typeof functions.setUpgradeOfAdapter>
+export type SetUpgradeOfAdapterReturn = FunctionReturn<typeof functions.setUpgradeOfAdapter>
+
+export type SetUpgradeOfLockerParams = FunctionArguments<typeof functions.setUpgradeOfLocker>
+export type SetUpgradeOfLockerReturn = FunctionReturn<typeof functions.setUpgradeOfLocker>
 
 export type SetVaultForProtocolParams = FunctionArguments<typeof functions.setVaultForProtocol>
 export type SetVaultForProtocolReturn = FunctionReturn<typeof functions.setVaultForProtocol>
@@ -203,6 +214,9 @@ export type TokenOfVaultReturn = FunctionReturn<typeof functions.tokenOfVault>
 export type TransferOwnershipParams = FunctionArguments<typeof functions.transferOwnership>
 export type TransferOwnershipReturn = FunctionReturn<typeof functions.transferOwnership>
 
-export type UpgradeOfParams = FunctionArguments<typeof functions.upgradeOf>
-export type UpgradeOfReturn = FunctionReturn<typeof functions.upgradeOf>
+export type UpgradeOfAdapterParams = FunctionArguments<typeof functions.upgradeOfAdapter>
+export type UpgradeOfAdapterReturn = FunctionReturn<typeof functions.upgradeOfAdapter>
+
+export type UpgradeOfLockerParams = FunctionArguments<typeof functions.upgradeOfLocker>
+export type UpgradeOfLockerReturn = FunctionReturn<typeof functions.upgradeOfLocker>
 

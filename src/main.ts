@@ -518,20 +518,21 @@ async function updateVaultTotalStake(
 }
 
 async function updateBGTDelegation(
-  lockerAddress: string,
-  vault: string,
+  locker: string,
+  validator: string,
   queuedChange: bigint,
   activatedChange: bigint,
   mctx: MappingContext
 ) {
-  const id = lockerAddress.toLowerCase() + "-" + vault.toLowerCase();
+  const id = locker.toLowerCase() + "-" + validator.toLowerCase();
   mctx.store.defer(BGTDelegation, id);
   mctx.queue.push(async () => {
     const existingDelegation = await mctx.store.get(BGTDelegation, id);
     await mctx.store.upsert(
       new BGTDelegation({
         id,
-        locker: lockerAddress.toLowerCase(),
+        locker: locker.toLowerCase(),
+        validator: validator.toLowerCase(),
         queued: (existingDelegation?.queued || BigInt(0)) + queuedChange,
         activated:
           (existingDelegation?.activated || BigInt(0)) + activatedChange,

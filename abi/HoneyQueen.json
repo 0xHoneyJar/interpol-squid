@@ -390,7 +390,25 @@
   },
   {
     "type": "function",
-    "name": "setUpgradeOf",
+    "name": "setUpgradeOfAdapter",
+    "inputs": [
+      {
+        "name": "fromLogic",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "toLogic",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "setUpgradeOfLocker",
     "inputs": [
       {
         "name": "fromLogic",
@@ -468,7 +486,26 @@
   },
   {
     "type": "function",
-    "name": "upgradeOf",
+    "name": "upgradeOfAdapter",
+    "inputs": [
+      {
+        "name": "fromLogic",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "toLogic",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "upgradeOfLocker",
     "inputs": [
       {
         "name": "fromLogic",
@@ -520,6 +557,25 @@
         "indexed": true,
         "internalType": "string"
       },
+      {
+        "name": "fromLogic",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "toLogic",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "HoneyQueen__LockerUpgraded",
+    "inputs": [
       {
         "name": "fromLogic",
         "type": "address",
@@ -602,11 +658,6 @@
   {
     "type": "error",
     "name": "AlreadyInitialized",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "HoneyQueen__AdapterAlreadyExists",
     "inputs": []
   },
   {

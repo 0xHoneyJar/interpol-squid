@@ -12,11 +12,13 @@ export const events = {
     HoneyLocker__Staked: event("0xb79e28292a8aeda2cc4b0796574e8e910b4b2bdd20da4618ba031be8904642c4", "HoneyLocker__Staked(address,address,uint256)", {"vault": indexed(p.address), "LPToken": indexed(p.address), "amountOrId": p.uint256}),
     HoneyLocker__TreasurySet: event("0x1cfd57337acaaed7c247ecca0f8fdfdf9d9e397ef5dafd91b72f4127969d9711", "HoneyLocker__TreasurySet(address)", {"treasury": indexed(p.address)}),
     HoneyLocker__Unstaked: event("0x3fbddeb8cf191a7224b036f2936759a3c73ed98a41ca294185cd751552f540f1", "HoneyLocker__Unstaked(address,address,uint256)", {"vault": indexed(p.address), "LPToken": indexed(p.address), "amountOrId": p.uint256}),
+    HoneyLocker__Upgraded: event("0x15ac7b00fd4664d84bd89029d3f6c215d5edf88a90fe39debb317bbd6f13f73f", "HoneyLocker__Upgraded(address,address)", {"oldImplementation": p.address, "newImplementation": p.address}),
     HoneyLocker__Wildcard: event("0xf7f0ed0f2b94710cb25d12685d78341088499642c3e4e629c8b29274bc020857", "HoneyLocker__Wildcard(address,uint8,bytes)", {"vault": indexed(p.address), "func": indexed(p.uint8), "args": p.bytes}),
     HoneyLocker__Withdrawn: event("0x3d2663eb759e4c9d27f9e857a4f4bab24e85612c773ea268d88c010e89f48dc2", "HoneyLocker__Withdrawn(address,uint256)", {"LPToken": indexed(p.address), "amountOrId": p.uint256}),
     OwnershipHandoverCanceled: event("0xfa7b8eab7da67f412cc9575ed43464468f9bfbae89d1675917346ca6d8fe3c92", "OwnershipHandoverCanceled(address)", {"pendingOwner": indexed(p.address)}),
     OwnershipHandoverRequested: event("0xdbf36a107da19e49527a7176a1babf963b4b0ff8cde35ee35d6cd8f1f9ac7e1d", "OwnershipHandoverRequested(address)", {"pendingOwner": indexed(p.address)}),
     OwnershipTransferred: event("0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0", "OwnershipTransferred(address,address)", {"oldOwner": indexed(p.address), "newOwner": indexed(p.address)}),
+    Upgraded: event("0xbc7cd75a20ee27fd9adebab32041f755214dbc6bffa90cc0225b39da2e5c2d3b", "Upgraded(address)", {"implementation": indexed(p.address)}),
 }
 
 export const functions = {
@@ -33,6 +35,8 @@ export const functions = {
     dropBoost: fun("0x1db6c3a1", "dropBoost(uint128,address)", {"amount": p.uint128, "validator": p.address}, ),
     expirations: viewFun("0x3c74db0f", "expirations(address)", {"LPToken": p.address}, p.uint256),
     honeyQueen: viewFun("0xee9ec831", "honeyQueen()", {}, p.address),
+    implementation: viewFun("0x5c60da1b", "implementation()", {}, p.address),
+    initialize: fun("0xfecf9734", "initialize(address,address,address,bool)", {"_honeyQueen": p.address, "_owner": p.address, "_referrer": p.address, "_unlocked": p.bool}, ),
     operator: viewFun("0x570ca735", "operator()", {}, p.address),
     owner: viewFun("0x8da5cb5b", "owner()", {}, p.address),
     ownershipHandoverExpiresAt: viewFun("0xfee81cf4", "ownershipHandoverExpiresAt(address)", {"pendingOwner": p.address}, p.uint256),
@@ -49,6 +53,8 @@ export const functions = {
     unlocked: viewFun("0x6a5e2650", "unlocked()", {}, p.bool),
     unstake: fun("0xc2a672e0", "unstake(address,uint256)", {"vault": p.address, "amount": p.uint256}, ),
     upgradeAdapter: fun("0xc808a7ee", "upgradeAdapter(string)", {"protocol": p.string}, ),
+    upgradeLocker: fun("0xf8ae0485", "upgradeLocker()", {}, ),
+    version: viewFun("0x54fd4d50", "version()", {}, p.uint256),
     wildcard: fun("0xedb4b5cf", "wildcard(address,uint8,bytes)", {"vault": p.address, "func": p.uint8, "args": p.bytes}, ),
     withdrawBERA: fun("0x3a1f406c", "withdrawBERA(uint256)", {"_amount": p.uint256}, ),
     withdrawERC1155: fun("0xa1538bde", "withdrawERC1155(address,uint256,uint256,bytes)", {"_token": p.address, "_id": p.uint256, "_amount": p.uint256, "_data": p.bytes}, ),
@@ -69,6 +75,10 @@ export class Contract extends ContractBase {
 
     honeyQueen() {
         return this.eth_call(functions.honeyQueen, {})
+    }
+
+    implementation() {
+        return this.eth_call(functions.implementation, {})
     }
 
     operator() {
@@ -98,6 +108,10 @@ export class Contract extends ContractBase {
     unlocked() {
         return this.eth_call(functions.unlocked, {})
     }
+
+    version() {
+        return this.eth_call(functions.version, {})
+    }
 }
 
 /// Event types
@@ -110,11 +124,13 @@ export type HoneyLocker__OperatorSetEventArgs = EParams<typeof events.HoneyLocke
 export type HoneyLocker__StakedEventArgs = EParams<typeof events.HoneyLocker__Staked>
 export type HoneyLocker__TreasurySetEventArgs = EParams<typeof events.HoneyLocker__TreasurySet>
 export type HoneyLocker__UnstakedEventArgs = EParams<typeof events.HoneyLocker__Unstaked>
+export type HoneyLocker__UpgradedEventArgs = EParams<typeof events.HoneyLocker__Upgraded>
 export type HoneyLocker__WildcardEventArgs = EParams<typeof events.HoneyLocker__Wildcard>
 export type HoneyLocker__WithdrawnEventArgs = EParams<typeof events.HoneyLocker__Withdrawn>
 export type OwnershipHandoverCanceledEventArgs = EParams<typeof events.OwnershipHandoverCanceled>
 export type OwnershipHandoverRequestedEventArgs = EParams<typeof events.OwnershipHandoverRequested>
 export type OwnershipTransferredEventArgs = EParams<typeof events.OwnershipTransferred>
+export type UpgradedEventArgs = EParams<typeof events.Upgraded>
 
 /// Function types
 export type ActivateBoostParams = FunctionArguments<typeof functions.activateBoost>
@@ -155,6 +171,12 @@ export type ExpirationsReturn = FunctionReturn<typeof functions.expirations>
 
 export type HoneyQueenParams = FunctionArguments<typeof functions.honeyQueen>
 export type HoneyQueenReturn = FunctionReturn<typeof functions.honeyQueen>
+
+export type ImplementationParams = FunctionArguments<typeof functions.implementation>
+export type ImplementationReturn = FunctionReturn<typeof functions.implementation>
+
+export type InitializeParams = FunctionArguments<typeof functions.initialize>
+export type InitializeReturn = FunctionReturn<typeof functions.initialize>
 
 export type OperatorParams = FunctionArguments<typeof functions.operator>
 export type OperatorReturn = FunctionReturn<typeof functions.operator>
@@ -203,6 +225,12 @@ export type UnstakeReturn = FunctionReturn<typeof functions.unstake>
 
 export type UpgradeAdapterParams = FunctionArguments<typeof functions.upgradeAdapter>
 export type UpgradeAdapterReturn = FunctionReturn<typeof functions.upgradeAdapter>
+
+export type UpgradeLockerParams = FunctionArguments<typeof functions.upgradeLocker>
+export type UpgradeLockerReturn = FunctionReturn<typeof functions.upgradeLocker>
+
+export type VersionParams = FunctionArguments<typeof functions.version>
+export type VersionReturn = FunctionReturn<typeof functions.version>
 
 export type WildcardParams = FunctionArguments<typeof functions.wildcard>
 export type WildcardReturn = FunctionReturn<typeof functions.wildcard>
