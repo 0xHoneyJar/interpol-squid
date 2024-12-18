@@ -23,6 +23,6 @@ export class LockerTotalStake {
     @BigIntColumn_({nullable: false})
     amount!: bigint
 
-    @StringColumn_({array: true, nullable: false})
-    nftIds!: (string | undefined | null)[]
+    @StringColumn_({array: true, nullable: true})
+    nftIds!: (string | undefined | null)[] | undefined | null
 }

@@ -1,5 +1,5 @@
-module.exports = class Data1734516127257 {
-    name = 'Data1734516127257'
+module.exports = class Data1734546666304 {
+    name = 'Data1734546666304'
 
     async up(db) {
         await db.query(`CREATE TABLE "locker" ("id" character varying NOT NULL, "owner" text NOT NULL, "treasury" text, "operator" text, "timestamp" numeric NOT NULL, "address" text NOT NULL, "unlocked" boolean NOT NULL, "referrer" text NOT NULL, CONSTRAINT "PK_295c0898cceea20ac8ee103d98d" PRIMARY KEY ("id"))`)
@@ -11,7 +11,7 @@ module.exports = class Data1734516127257 {
         await db.query(`CREATE INDEX "IDX_92b0a43857924ea7731e9cab23" ON "locker_deposit" ("locker") `)
         await db.query(`CREATE TABLE "locker_withdrawal" ("id" character varying NOT NULL, "locker" text NOT NULL, "token" text NOT NULL, "amount_or_id" numeric NOT NULL, "timestamp" numeric NOT NULL, "transaction_hash" text NOT NULL, CONSTRAINT "PK_0239484f7fb9743719decab4a5b" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_2971331145743f43f0c142938c" ON "locker_withdrawal" ("locker") `)
-        await db.query(`CREATE TABLE "locker_total_deposit" ("id" character varying NOT NULL, "locker" text NOT NULL, "token" text NOT NULL, "amount" numeric NOT NULL, "nft_ids" text array NOT NULL, "lock_expiration" numeric, CONSTRAINT "PK_29235a1ebdd51044b76b56973df" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "locker_total_deposit" ("id" character varying NOT NULL, "locker" text NOT NULL, "token" text NOT NULL, "amount" numeric NOT NULL, "nft_ids" text array, "lock_expiration" numeric, CONSTRAINT "PK_29235a1ebdd51044b76b56973df" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_c7604eb29a8637f3614bbc6c14" ON "locker_total_deposit" ("locker") `)
         await db.query(`CREATE TABLE "locker_stake" ("id" character varying NOT NULL, "locker" text NOT NULL, "vault" text NOT NULL, "token" text NOT NULL, "amount_or_id" numeric NOT NULL, "timestamp" numeric NOT NULL, "transaction_hash" text NOT NULL, CONSTRAINT "PK_056102190d1a432bec34fc01fd1" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_7d55600ce25a74f8cfe40930ce" ON "locker_stake" ("locker") `)
@@ -19,7 +19,7 @@ module.exports = class Data1734516127257 {
         await db.query(`CREATE TABLE "locker_unstake" ("id" character varying NOT NULL, "locker" text NOT NULL, "vault" text NOT NULL, "token" text NOT NULL, "amount_or_id" numeric NOT NULL, "timestamp" numeric NOT NULL, "transaction_hash" text NOT NULL, CONSTRAINT "PK_4c1ff1bb0afcc47671579223f3d" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_fd47720b6f6c9e8394846f38f9" ON "locker_unstake" ("locker") `)
         await db.query(`CREATE INDEX "IDX_8c61b0118e400a71387c974bf4" ON "locker_unstake" ("vault") `)
-        await db.query(`CREATE TABLE "locker_total_stake" ("id" character varying NOT NULL, "locker" text NOT NULL, "vault" text NOT NULL, "token" text NOT NULL, "amount" numeric NOT NULL, "nft_ids" text array NOT NULL, CONSTRAINT "PK_fdf3a71572253a285b36eee62f3" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "locker_total_stake" ("id" character varying NOT NULL, "locker" text NOT NULL, "vault" text NOT NULL, "token" text NOT NULL, "amount" numeric NOT NULL, "nft_ids" text array, CONSTRAINT "PK_fdf3a71572253a285b36eee62f3" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_599b17155c01373bb39f7eb12e" ON "locker_total_stake" ("locker") `)
         await db.query(`CREATE INDEX "IDX_5d71d6264252bb52b382505036" ON "locker_total_stake" ("vault") `)
         await db.query(`CREATE TABLE "locker_rewards_claim" ("id" character varying NOT NULL, "locker" text NOT NULL, "vault" text NOT NULL, "token" text NOT NULL, "amount" numeric NOT NULL, "timestamp" numeric NOT NULL, "transaction_hash" text NOT NULL, CONSTRAINT "PK_a423d8ea676a6fbf9673797fca6" PRIMARY KEY ("id"))`)

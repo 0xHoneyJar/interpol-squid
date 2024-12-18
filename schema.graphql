@@ -52,7 +52,7 @@ type LockerTotalDeposit @entity {
   locker: String! @index
   token: String!
   amount: BigInt!
-  nftIds: [String]!
+  nftIds: [String]
   lockExpiration: BigInt
 }
 
@@ -85,7 +85,7 @@ type LockerTotalStake @entity {
   vault: String! @index
   token: String!
   amount: BigInt!
-  nftIds: [String]!
+  nftIds: [String]
 }
 
 type LockerRewardsClaim @entity {
