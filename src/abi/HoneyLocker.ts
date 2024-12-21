@@ -48,12 +48,14 @@ export const functions = {
     setOperator: fun("0xb3ab15fb", "setOperator(address)", {"_operator": p.address}, ),
     setTreasury: fun("0xf0f44260", "setTreasury(address)", {"_treasury": p.address}, ),
     stake: fun("0xadc9772e", "stake(address,uint256)", {"vault": p.address, "amount": p.uint256}, ),
+    totalLPStaked: viewFun("0xfb14f439", "totalLPStaked(address)", {"LPToken": p.address}, p.uint256),
     transferOwnership: fun("0xf2fde38b", "transferOwnership(address)", {"newOwner": p.address}, ),
     treasury: viewFun("0x61d027b3", "treasury()", {}, p.address),
     unlocked: viewFun("0x6a5e2650", "unlocked()", {}, p.bool),
     unstake: fun("0xc2a672e0", "unstake(address,uint256)", {"vault": p.address, "amount": p.uint256}, ),
     upgradeAdapter: fun("0xc808a7ee", "upgradeAdapter(string)", {"protocol": p.string}, ),
     upgradeLocker: fun("0xf8ae0485", "upgradeLocker()", {}, ),
+    vaultLPStaked: viewFun("0x104ddd07", "vaultLPStaked(address)", {"vault": p.address}, p.uint256),
     version: viewFun("0x54fd4d50", "version()", {}, p.uint256),
     wildcard: fun("0xedb4b5cf", "wildcard(address,uint8,bytes)", {"vault": p.address, "func": p.uint8, "args": p.bytes}, ),
     withdrawBERA: fun("0x3a1f406c", "withdrawBERA(uint256)", {"_amount": p.uint256}, ),
@@ -101,12 +103,20 @@ export class Contract extends ContractBase {
         return this.eth_call(functions.referrer, {})
     }
 
+    totalLPStaked(LPToken: TotalLPStakedParams["LPToken"]) {
+        return this.eth_call(functions.totalLPStaked, {LPToken})
+    }
+
     treasury() {
         return this.eth_call(functions.treasury, {})
     }
 
     unlocked() {
         return this.eth_call(functions.unlocked, {})
+    }
+
+    vaultLPStaked(vault: VaultLPStakedParams["vault"]) {
+        return this.eth_call(functions.vaultLPStaked, {vault})
     }
 
     version() {
@@ -211,6 +221,9 @@ export type SetTreasuryReturn = FunctionReturn<typeof functions.setTreasury>
 export type StakeParams = FunctionArguments<typeof functions.stake>
 export type StakeReturn = FunctionReturn<typeof functions.stake>
 
+export type TotalLPStakedParams = FunctionArguments<typeof functions.totalLPStaked>
+export type TotalLPStakedReturn = FunctionReturn<typeof functions.totalLPStaked>
+
 export type TransferOwnershipParams = FunctionArguments<typeof functions.transferOwnership>
 export type TransferOwnershipReturn = FunctionReturn<typeof functions.transferOwnership>
 
@@ -228,6 +241,9 @@ export type UpgradeAdapterReturn = FunctionReturn<typeof functions.upgradeAdapte
 
 export type UpgradeLockerParams = FunctionArguments<typeof functions.upgradeLocker>
 export type UpgradeLockerReturn = FunctionReturn<typeof functions.upgradeLocker>
+
+export type VaultLPStakedParams = FunctionArguments<typeof functions.vaultLPStaked>
+export type VaultLPStakedReturn = FunctionReturn<typeof functions.vaultLPStaked>
 
 export type VersionParams = FunctionArguments<typeof functions.version>
 export type VersionReturn = FunctionReturn<typeof functions.version>
