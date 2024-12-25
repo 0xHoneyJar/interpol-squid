@@ -24,6 +24,7 @@ import {
   XKDKFinalizedRedeem,
   XKDKRedeem,
   BGTDelegation,
+  Adapter,
 } from "./model";
 import { processor, ProcessorContext } from "./processor";
 
@@ -275,7 +276,7 @@ function processTreasurySet(log: Log, block: any, mctx: MappingContext) {
   });
 }
 
-function processAdapterRegistered(log: Log, block: any, mctx: MappingContext) {
+async function processAdapterRegistered(log: Log, block: any, mctx: MappingContext) {
   const { protocol, adapter } =
     honeyLockerAbi.events.HoneyLocker__AdapterRegistered.decode(log);
   mctx.queue.push(async () => {
@@ -285,12 +286,24 @@ function processAdapterRegistered(log: Log, block: any, mctx: MappingContext) {
         locker: log.address.toLowerCase(),
         protocol: protocol.toLowerCase(),
         adapter: adapter.toLowerCase(),
+        timestamp: BigInt(block.header.timestamp),
+        transactionHash: log.transaction?.hash,
+      })
+    );
+    
+    // Also create/update the Adapter entity for lookups
+    await mctx.store.upsert(
+      new Adapter({
+        id: adapter.toLowerCase(),
+        address: adapter.toLowerCase(),
+        protocol: protocol.toLowerCase(),
+        locker: log.address.toLowerCase(),
       })
     );
   });
 }
 
-function processAdapterUpgraded(log: Log, block: any, mctx: MappingContext) {
+async function processAdapterUpgraded(log: Log, block: any, mctx: MappingContext) {
   const { protocol, newImplementation } =
     honeyLockerAbi.events.HoneyLocker__AdapterUpgraded.decode(log);
   mctx.queue.push(async () => {
@@ -300,6 +313,8 @@ function processAdapterUpgraded(log: Log, block: any, mctx: MappingContext) {
         locker: log.address.toLowerCase(),
         protocol: protocol.toLowerCase(),
         newImplementation: newImplementation.toLowerCase(),
+        timestamp: BigInt(block.header.timestamp),
+        transactionHash: log.transaction?.hash,
       })
     );
   });
@@ -373,14 +388,16 @@ async function processXKDKFinalizedRedeem(
 ) {
   const { userAddress, xKodiakAmount } =
     xkdkAbi.events.FinalizeRedeem.decode(log);
-  mctx.store.defer(Locker, log.address.toLowerCase());
+  
+  // Look up the locker by the adapter address (userAddress)
+  mctx.store.defer(Adapter, userAddress.toLowerCase());
   mctx.queue.push(async () => {
-    const isVault = await mctx.store.get(Locker, log.address.toLowerCase());
-    if (isVault) {
+    const adapter = await mctx.store.get(Adapter, userAddress.toLowerCase());
+    if (adapter) {
       await mctx.store.upsert(
         new XKDKFinalizedRedeem({
           id: log.id,
-          locker: log.address.toLowerCase(),
+          locker: adapter.locker,
           amount: xKodiakAmount,
           timestamp: BigInt(block.header.timestamp),
           transactionHash: log.transaction?.hash,
@@ -393,14 +410,16 @@ async function processXKDKFinalizedRedeem(
 async function processXKDKRedeem(log: Log, block: any, mctx: MappingContext) {
   const { userAddress, xKodiakAmount, kodiakAmount, duration } =
     xkdkAbi.events.Redeem.decode(log);
-  mctx.store.defer(Locker, log.address.toLowerCase());
+  
+  // Look up the locker by the adapter address (userAddress)
+  mctx.store.defer(Adapter, userAddress.toLowerCase());
   mctx.queue.push(async () => {
-    const isVault = await mctx.store.get(Locker, log.address.toLowerCase());
-    if (isVault) {
+    const adapter = await mctx.store.get(Adapter, userAddress.toLowerCase());
+    if (adapter) {
       await mctx.store.upsert(
         new XKDKRedeem({
           id: log.id,
-          locker: log.address.toLowerCase(),
+          locker: adapter.locker,
           xKodiakAmount: xKodiakAmount,
           kodiakAmount: kodiakAmount,
           duration: duration,

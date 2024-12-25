@@ -11,9 +11,9 @@ type Locker @entity {
 
 type Adapter @entity {
   id: ID!
-  address: String!
+  address: String! @index
   protocol: String!
-  vault: String! @index
+  locker: String! @index
 }
 
 type LPToken @entity {

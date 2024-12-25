@@ -9,6 +9,7 @@ export class Adapter {
     @PrimaryColumn_()
     id!: string
 
+    @Index_()
     @StringColumn_({nullable: false})
     address!: string
 
@@ -17,5 +18,5 @@ export class Adapter {
 
     @Index_()
     @StringColumn_({nullable: false})
-    vault!: string
+    locker!: string
 }

@@ -1,11 +1,12 @@
-module.exports = class Data1734809452484 {
-    name = 'Data1734809452484'
+module.exports = class Data1735128964625 {
+    name = 'Data1735128964625'
 
     async up(db) {
         await db.query(`CREATE TABLE "locker" ("id" character varying NOT NULL, "owner" text NOT NULL, "treasury" text, "operator" text, "timestamp" numeric NOT NULL, "address" text NOT NULL, "unlocked" boolean NOT NULL, "referrer" text NOT NULL, CONSTRAINT "PK_295c0898cceea20ac8ee103d98d" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_86f6b281a8b23d1b5e6343265e" ON "locker" ("owner") `)
-        await db.query(`CREATE TABLE "adapter" ("id" character varying NOT NULL, "address" text NOT NULL, "protocol" text NOT NULL, "vault" text NOT NULL, CONSTRAINT "PK_e7afb98e16ea0521677e0439acb" PRIMARY KEY ("id"))`)
-        await db.query(`CREATE INDEX "IDX_ca06124ffe2a9c8d9acf837f32" ON "adapter" ("vault") `)
+        await db.query(`CREATE TABLE "adapter" ("id" character varying NOT NULL, "address" text NOT NULL, "protocol" text NOT NULL, "locker" text NOT NULL, CONSTRAINT "PK_e7afb98e16ea0521677e0439acb" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_9b7ed7bda5f0c6a59aaf6044dd" ON "adapter" ("address") `)
+        await db.query(`CREATE INDEX "IDX_d6408e753e677a29a711ec1b39" ON "adapter" ("locker") `)
         await db.query(`CREATE TABLE "lp_token" ("id" character varying NOT NULL, "address" text NOT NULL, "name" text, "symbol" text, CONSTRAINT "PK_3737dbc5233b14a02a3756d2597" PRIMARY KEY ("id"))`)
         await db.query(`CREATE TABLE "locker_deposit" ("id" character varying NOT NULL, "locker" text NOT NULL, "token" text NOT NULL, "amount_or_id" numeric NOT NULL, "timestamp" numeric NOT NULL, "lock_expiration" numeric, "transaction_hash" text NOT NULL, CONSTRAINT "PK_7e1ed8df86f1317083e6165f76b" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_92b0a43857924ea7731e9cab23" ON "locker_deposit" ("locker") `)
@@ -48,7 +49,8 @@ module.exports = class Data1734809452484 {
         await db.query(`DROP TABLE "locker"`)
         await db.query(`DROP INDEX "public"."IDX_86f6b281a8b23d1b5e6343265e"`)
         await db.query(`DROP TABLE "adapter"`)
-        await db.query(`DROP INDEX "public"."IDX_ca06124ffe2a9c8d9acf837f32"`)
+        await db.query(`DROP INDEX "public"."IDX_9b7ed7bda5f0c6a59aaf6044dd"`)
+        await db.query(`DROP INDEX "public"."IDX_d6408e753e677a29a711ec1b39"`)
         await db.query(`DROP TABLE "lp_token"`)
         await db.query(`DROP TABLE "locker_deposit"`)
         await db.query(`DROP INDEX "public"."IDX_92b0a43857924ea7731e9cab23"`)
