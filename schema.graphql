@@ -142,12 +142,21 @@ type Fees @entity {
   timestamp: BigInt!
 }
 
+enum BGTDelegationState {
+  QUEUED
+  ACTIVATED
+  DROPPED
+}
+
 type BGTDelegation @entity {
   id: ID!
   locker: String! @index
   validator: String!
-  queued: BigInt!
-  activated: BigInt!
+  amount: BigInt!
+  state: BGTDelegationState!
+  timestamp: BigInt!
+  queuedAtBlock: Int!
+  transactionHash: String!
 }
 
 type XKDKFinalizedRedeem @entity {

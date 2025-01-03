@@ -1,0 +1,7 @@
+Project: Subsquid Indexer for HoneyLocker Protocol
+Current Task: Update BGT delegation tracking to use enum states
+- Modify schema.graphql to include BGTDelegationState enum
+- Update BGTDelegation entity to use state-based tracking
+- Implement state transitions in BGT event handlers
+- Track timestamps, transaction hashes, and block numbers for historical data
+- Remove old queued/activated amount tracking 

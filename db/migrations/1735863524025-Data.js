@@ -1,5 +1,5 @@
-module.exports = class Data1735128964625 {
-    name = 'Data1735128964625'
+module.exports = class Data1735863524025 {
+    name = 'Data1735863524025'
 
     async up(db) {
         await db.query(`CREATE TABLE "locker" ("id" character varying NOT NULL, "owner" text NOT NULL, "treasury" text, "operator" text, "timestamp" numeric NOT NULL, "address" text NOT NULL, "unlocked" boolean NOT NULL, "referrer" text NOT NULL, CONSTRAINT "PK_295c0898cceea20ac8ee103d98d" PRIMARY KEY ("id"))`)
@@ -34,7 +34,7 @@ module.exports = class Data1735128964625 {
         await db.query(`CREATE TABLE "adapter_upgraded" ("id" character varying NOT NULL, "locker" text NOT NULL, "protocol" text NOT NULL, "new_implementation" text NOT NULL, "timestamp" numeric NOT NULL, "transaction_hash" text NOT NULL, CONSTRAINT "PK_80ba6d3e43b350831ea841fc8e3" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_41c57170de73343b6243e2c792" ON "adapter_upgraded" ("locker") `)
         await db.query(`CREATE TABLE "fees" ("id" character varying NOT NULL, "referral" text NOT NULL, "token" text NOT NULL, "amount" numeric NOT NULL, "transaction_hash" text NOT NULL, "timestamp" numeric NOT NULL, CONSTRAINT "PK_97f3a1b1b8ee5674fd4da93f461" PRIMARY KEY ("id"))`)
-        await db.query(`CREATE TABLE "bgt_delegation" ("id" character varying NOT NULL, "locker" text NOT NULL, "validator" text NOT NULL, "queued" numeric NOT NULL, "activated" numeric NOT NULL, CONSTRAINT "PK_1df066562fa706e41ff490333ed" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "bgt_delegation" ("id" character varying NOT NULL, "locker" text NOT NULL, "validator" text NOT NULL, "amount" numeric NOT NULL, "state" character varying(9) NOT NULL, "timestamp" numeric NOT NULL, "queued_at_block" integer NOT NULL, "transaction_hash" text NOT NULL, CONSTRAINT "PK_1df066562fa706e41ff490333ed" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_e62381f49a5d42797789ad4bcc" ON "bgt_delegation" ("locker") `)
         await db.query(`CREATE TABLE "xkdk_finalized_redeem" ("id" character varying NOT NULL, "locker" text NOT NULL, "amount" numeric NOT NULL, "timestamp" numeric NOT NULL, "transaction_hash" text NOT NULL, CONSTRAINT "PK_80cb2645ef932a9eb6a5fad3536" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_80359b1caddb97a68866fbfa95" ON "xkdk_finalized_redeem" ("locker") `)

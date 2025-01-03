@@ -5,26 +5,27 @@ import {
 import { Log } from "@subsquid/evm-processor";
 import * as bgtAbi from "./abi/BGT";
 import * as erc20Abi from "./abi/ERC20";
-import * as lockerFactoryAbi from "./abi/LockerFactory";
 import * as honeyLockerAbi from "./abi/HoneyLocker";
+import * as lockerFactoryAbi from "./abi/LockerFactory";
 import * as xkdkAbi from "./abi/XKDK";
 import {
+  Adapter,
+  AdapterRegistered,
+  AdapterUpgraded,
+  BGTDelegation,
+  BGTDelegationState,
   Locker,
   LockerBalance,
   LockerDeposit,
-  LockerWithdrawal,
-  LockerTotalDeposit,
-  LockerStake,
-  LockerUnstake,
-  LockerTotalStake,
   LockerRewardsClaim,
+  LockerStake,
+  LockerTotalDeposit,
+  LockerTotalStake,
+  LockerUnstake,
   LockerWildcard,
-  AdapterUpgraded,
-  AdapterRegistered,
+  LockerWithdrawal,
   XKDKFinalizedRedeem,
   XKDKRedeem,
-  BGTDelegation,
-  Adapter,
 } from "./model";
 import { processor, ProcessorContext } from "./processor";
 
@@ -276,7 +277,11 @@ function processTreasurySet(log: Log, block: any, mctx: MappingContext) {
   });
 }
 
-async function processAdapterRegistered(log: Log, block: any, mctx: MappingContext) {
+async function processAdapterRegistered(
+  log: Log,
+  block: any,
+  mctx: MappingContext
+) {
   const { protocol, adapter } =
     honeyLockerAbi.events.HoneyLocker__AdapterRegistered.decode(log);
   mctx.queue.push(async () => {
@@ -290,7 +295,7 @@ async function processAdapterRegistered(log: Log, block: any, mctx: MappingConte
         transactionHash: log.transaction?.hash,
       })
     );
-    
+
     // Also create/update the Adapter entity for lookups
     await mctx.store.upsert(
       new Adapter({
@@ -303,7 +308,11 @@ async function processAdapterRegistered(log: Log, block: any, mctx: MappingConte
   });
 }
 
-async function processAdapterUpgraded(log: Log, block: any, mctx: MappingContext) {
+async function processAdapterUpgraded(
+  log: Log,
+  block: any,
+  mctx: MappingContext
+) {
   const { protocol, newImplementation } =
     honeyLockerAbi.events.HoneyLocker__AdapterUpgraded.decode(log);
   mctx.queue.push(async () => {
@@ -322,46 +331,69 @@ async function processAdapterUpgraded(log: Log, block: any, mctx: MappingContext
 
 async function processBGTQueueBoost(log: Log, mctx: MappingContext) {
   const { sender, validator, amount } = bgtAbi.events.QueueBoost.decode(log);
-  await updateBGTDelegation(
-    sender.toLowerCase(),
-    validator.toLowerCase(),
-    amount,
-    0n,
-    mctx
-  );
+  const id = `${sender.toLowerCase()}-${validator.toLowerCase()}`;
+
+  mctx.queue.push(async () => {
+    await mctx.store.upsert(
+      new BGTDelegation({
+        id,
+        locker: sender.toLowerCase(),
+        validator: validator.toLowerCase(),
+        amount,
+        state: BGTDelegationState.QUEUED,
+        timestamp: BigInt(log.block.timestamp),
+        queuedAtBlock: log.block.height,
+        transactionHash: log.transaction?.hash || "",
+      })
+    );
+  });
 }
 
 async function processBGTActivateBoost(log: Log, mctx: MappingContext) {
   const { sender, validator, amount } = bgtAbi.events.ActivateBoost.decode(log);
-  await updateBGTDelegation(
-    sender.toLowerCase(),
-    validator.toLowerCase(),
-    -amount,
-    amount,
-    mctx
-  );
-}
+  const id = `${sender.toLowerCase()}-${validator.toLowerCase()}`;
 
-async function processBGTCancelBoost(log: Log, mctx: MappingContext) {
-  const { sender, validator, amount } = bgtAbi.events.CancelBoost.decode(log);
-  await updateBGTDelegation(
-    sender.toLowerCase(),
-    validator.toLowerCase(),
-    -amount,
-    0n,
-    mctx
-  );
+  mctx.queue.push(async () => {
+    const delegation = await mctx.store.get(BGTDelegation, id);
+    if (delegation) {
+      await mctx.store.upsert(
+        new BGTDelegation({
+          ...delegation,
+          state: BGTDelegationState.ACTIVATED,
+          timestamp: BigInt(log.block.timestamp),
+          transactionHash: log.transaction?.hash || "",
+        })
+      );
+    }
+  });
 }
 
 async function processBGTDropBoost(log: Log, mctx: MappingContext) {
   const { sender, validator, amount } = bgtAbi.events.DropBoost.decode(log);
-  await updateBGTDelegation(
-    sender.toLowerCase(),
-    validator.toLowerCase(),
-    0n,
-    -amount,
-    mctx
-  );
+  const id = `${sender.toLowerCase()}-${validator.toLowerCase()}`;
+
+  mctx.queue.push(async () => {
+    const delegation = await mctx.store.get(BGTDelegation, id);
+    if (delegation) {
+      await mctx.store.upsert(
+        new BGTDelegation({
+          ...delegation,
+          state: BGTDelegationState.DROPPED,
+          timestamp: BigInt(log.block.timestamp),
+          transactionHash: log.transaction?.hash || "",
+        })
+      );
+    }
+  });
+}
+
+async function processBGTCancelBoost(log: Log, mctx: MappingContext) {
+  const { sender, validator, amount } = bgtAbi.events.CancelBoost.decode(log);
+  const id = `${sender.toLowerCase()}-${validator.toLowerCase()}`;
+
+  mctx.queue.push(async () => {
+    await mctx.store.remove(BGTDelegation, id);
+  });
 }
 
 async function processOwnershipTransferred(log: Log, mctx: MappingContext) {
@@ -388,7 +420,7 @@ async function processXKDKFinalizedRedeem(
 ) {
   const { userAddress, xKodiakAmount } =
     xkdkAbi.events.FinalizeRedeem.decode(log);
-  
+
   // Look up the locker by the adapter address (userAddress)
   mctx.store.defer(Adapter, userAddress.toLowerCase());
   mctx.queue.push(async () => {
@@ -410,7 +442,7 @@ async function processXKDKFinalizedRedeem(
 async function processXKDKRedeem(log: Log, block: any, mctx: MappingContext) {
   const { userAddress, xKodiakAmount, kodiakAmount, duration } =
     xkdkAbi.events.Redeem.decode(log);
-  
+
   // Look up the locker by the adapter address (userAddress)
   mctx.store.defer(Adapter, userAddress.toLowerCase());
   mctx.queue.push(async () => {
@@ -533,30 +565,6 @@ async function updateVaultTotalStake(
         token: token.toLowerCase(),
         vault: vault.toLowerCase(),
         amount: (existingStake?.amount || BigInt(0)) + amount,
-      })
-    );
-  });
-}
-
-async function updateBGTDelegation(
-  locker: string,
-  validator: string,
-  queuedChange: bigint,
-  activatedChange: bigint,
-  mctx: MappingContext
-) {
-  const id = locker.toLowerCase() + "-" + validator.toLowerCase();
-  mctx.store.defer(BGTDelegation, id);
-  mctx.queue.push(async () => {
-    const existingDelegation = await mctx.store.get(BGTDelegation, id);
-    await mctx.store.upsert(
-      new BGTDelegation({
-        id,
-        locker: locker.toLowerCase(),
-        validator: validator.toLowerCase(),
-        queued: (existingDelegation?.queued || BigInt(0)) + queuedChange,
-        activated:
-          (existingDelegation?.activated || BigInt(0)) + activatedChange,
       })
     );
   });

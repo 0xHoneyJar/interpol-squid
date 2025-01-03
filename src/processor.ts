@@ -8,18 +8,20 @@ import {
 } from "@subsquid/evm-processor";
 import { assertNotNull } from "@subsquid/util-internal";
 import * as bgtAbi from "./abi/BGT"; // You'll need to add this ABI
-import * as lockerFactoryAbi from "./abi/LockerFactory";
 import * as honeyLockerAbi from "./abi/HoneyLocker";
+import * as lockerFactoryAbi from "./abi/LockerFactory";
 import * as xkdkAbi from "./abi/XKDK";
 //import * as kodiakAbi from "./abi/Kodiak"; // You'll need to add this ABI
 import * as erc20Abi from "./abi/ERC20"; // You'll need to add this ABI
 import { BGT_ADDRESS, FACTORY_ADDRESS, XKDK_ADDRESS } from "./addresses";
 
 export const processor = new EvmBatchProcessor()
-  .setGateway("https://v2.archive.subsquid.io/network/berachain-bartio")
-  .setRpcEndpoint({
-    url: assertNotNull(process.env.RPC_BERA_HTTP, "No RPC endpoint supplied"),
-  })
+  .setPortal(
+    assertNotNull(
+      process.env.PORTAL_URL,
+      "Required env variable PORTAL_URL is missing"
+    )
+  )
   .setFinalityConfirmation(20)
   .setFields({
     transaction: {
@@ -29,8 +31,7 @@ export const processor = new EvmBatchProcessor()
     },
   })
   .setBlockRange({
-    from: 
-    8399404, // deployment block of factory
+    from: 8399404, // deployment block of factory
   })
   .addLog({
     address: [FACTORY_ADDRESS], // Factory contract address
