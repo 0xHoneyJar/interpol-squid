@@ -333,9 +333,12 @@ async function processBGTQueueBoost(log: Log, mctx: MappingContext) {
   const { sender, validator, amount } = bgtAbi.events.QueueBoost.decode(log);
   const id = `${sender.toLowerCase()}-${validator.toLowerCase()}`;
 
+  mctx.store.defer(BGTDelegation, id);
   mctx.queue.push(async () => {
+    const existingDelegation = await mctx.store.get(BGTDelegation, id);
     await mctx.store.upsert(
       new BGTDelegation({
+        ...existingDelegation,
         id,
         locker: sender.toLowerCase(),
         validator: validator.toLowerCase(),
@@ -353,18 +356,19 @@ async function processBGTActivateBoost(log: Log, mctx: MappingContext) {
   const { sender, validator, amount } = bgtAbi.events.ActivateBoost.decode(log);
   const id = `${sender.toLowerCase()}-${validator.toLowerCase()}`;
 
+  mctx.store.defer(BGTDelegation, id);
   mctx.queue.push(async () => {
-    const delegation = await mctx.store.get(BGTDelegation, id);
-    if (delegation) {
-      await mctx.store.upsert(
-        new BGTDelegation({
-          ...delegation,
-          state: BGTDelegationState.ACTIVATED,
-          timestamp: BigInt(log.block.timestamp),
-          transactionHash: log.transaction?.hash || "",
-        })
-      );
-    }
+    const existingDelegation = await mctx.store.get(BGTDelegation, id);
+    if (!existingDelegation) return; // Guard clause for safety
+
+    await mctx.store.upsert(
+      new BGTDelegation({
+        ...existingDelegation,
+        state: BGTDelegationState.ACTIVATED,
+        timestamp: BigInt(log.block.timestamp),
+        transactionHash: log.transaction?.hash || "",
+      })
+    );
   });
 }
 
@@ -372,18 +376,19 @@ async function processBGTDropBoost(log: Log, mctx: MappingContext) {
   const { sender, validator, amount } = bgtAbi.events.DropBoost.decode(log);
   const id = `${sender.toLowerCase()}-${validator.toLowerCase()}`;
 
+  mctx.store.defer(BGTDelegation, id);
   mctx.queue.push(async () => {
-    const delegation = await mctx.store.get(BGTDelegation, id);
-    if (delegation) {
-      await mctx.store.upsert(
-        new BGTDelegation({
-          ...delegation,
-          state: BGTDelegationState.DROPPED,
-          timestamp: BigInt(log.block.timestamp),
-          transactionHash: log.transaction?.hash || "",
-        })
-      );
-    }
+    const existingDelegation = await mctx.store.get(BGTDelegation, id);
+    if (!existingDelegation) return; // Guard clause for safety
+
+    await mctx.store.upsert(
+      new BGTDelegation({
+        ...existingDelegation,
+        state: BGTDelegationState.DROPPED,
+        timestamp: BigInt(log.block.timestamp),
+        transactionHash: log.transaction?.hash || "",
+      })
+    );
   });
 }
 
@@ -391,6 +396,7 @@ async function processBGTCancelBoost(log: Log, mctx: MappingContext) {
   const { sender, validator, amount } = bgtAbi.events.CancelBoost.decode(log);
   const id = `${sender.toLowerCase()}-${validator.toLowerCase()}`;
 
+  mctx.store.defer(BGTDelegation, id);
   mctx.queue.push(async () => {
     await mctx.store.remove(BGTDelegation, id);
   });
