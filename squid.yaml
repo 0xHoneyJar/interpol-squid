@@ -16,5 +16,6 @@ deploy:
     cmd: ["sqd", "serve:prod"]
 scale:
   dedicated: true
-  postgres:
-    storage: 50GB
+  addons:
+    postgres:
+      storage: 50G
