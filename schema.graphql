@@ -1,9 +1,19 @@
-type Vault @entity {
+type Locker @entity {
   id: ID!
   owner: String! @index
   treasury: String
+  operator: String
   timestamp: BigInt!
   address: String!
+  unlocked: Boolean!
+  referrer: String!
+}
+
+type Adapter @entity {
+  id: ID!
+  address: String! @index
+  protocol: String!
+  locker: String! @index
 }
 
 type LPToken @entity {
@@ -13,89 +23,145 @@ type LPToken @entity {
   symbol: String
 }
 
-type VaultDeposit @entity {
+# ----------------------------------------------------
+#             Vault Deposits and Withdrawals
+# ----------------------------------------------------
+type LockerDeposit @entity {
   id: ID!
-  vaultAddress: String! @index
-  tokenAddress: String!
-  amount: BigInt!
+  locker: String! @index
+  token: String!
+  amountOrId: BigInt!
   timestamp: BigInt!
   lockExpiration: BigInt
   transactionHash: String!
 }
 
-type VaultWithdrawal @entity {
+type LockerWithdrawal @entity {
   id: ID!
-  vaultAddress: String! @index
-  tokenAddress: String!
-  amount: BigInt!
+  locker: String! @index
+  token: String!
+  amountOrId: BigInt!
   timestamp: BigInt!
   transactionHash: String!
 }
 
-type VaultTotalDeposit @entity {
+# tracks final state of a vault deposit
+# so all deposits minus all withdrawals
+type LockerTotalDeposit @entity {
   id: ID!
-  vaultAddress: String! @index
-  tokenAddress: String!
+  locker: String! @index
+  token: String!
   amount: BigInt!
+  nftIds: [String]
   lockExpiration: BigInt
 }
 
-type VaultStake @entity {
+# ----------------------------------------------------
+#                     Vault Actions
+# ----------------------------------------------------
+type LockerStake @entity {
   id: ID!
-  vaultAddress: String! @index
-  tokenAddress: String!
-  stakingContract: String! @index
+  locker: String! @index
+  vault: String! @index
+  token: String!
+  amountOrId: BigInt!
+  timestamp: BigInt!
+  transactionHash: String!
+}
+
+type LockerUnstake @entity {
+  id: ID!
+  locker: String! @index
+  vault: String! @index
+  token: String!
+  amountOrId: BigInt!
+  timestamp: BigInt!
+  transactionHash: String!
+}
+
+type LockerTotalStake @entity {
+  id: ID!
+  locker: String! @index
+  vault: String! @index
+  token: String!
+  amount: BigInt!
+  nftIds: [String]
+}
+
+type LockerRewardsClaim @entity {
+  id: ID!
+  locker: String! @index
+  vault: String! @index
+  token: String!
   amount: BigInt!
   timestamp: BigInt!
   transactionHash: String!
 }
 
-type VaultUnstake @entity {
+type LockerWildcard @entity {
   id: ID!
-  vaultAddress: String! @index
-  tokenAddress: String!
-  stakingContract: String! @index
-  amount: BigInt!
+  locker: String! @index
+  vault: String! @index
+  func: Int!
+  args: String!
   timestamp: BigInt!
   transactionHash: String!
 }
 
-type VaultTotalStake @entity {
+# ----------------------------------------------------
+#                     Vault Adapters
+# ----------------------------------------------------
+type AdapterRegistered @entity {
   id: ID!
-  vaultAddress: String! @index
-  tokenAddress: String!
-  stakingContract: String! @index
-  amount: BigInt!
+  locker: String! @index
+  protocol: String!
+  adapter: String!
+  timestamp: BigInt!
+  transactionHash: String!
 }
+
+type AdapterUpgraded @entity {
+  id: ID!
+  locker: String! @index
+  protocol: String!
+  newImplementation: String!
+  timestamp: BigInt!
+  transactionHash: String!
+}
+
+# ----------------------------------------------------
+#                     Misc
+# ----------------------------------------------------
 
 type Fees @entity {
   id: ID!
   referral: String!
-  tokenAddress: String!
+  token: String!
   amount: BigInt!
   transactionHash: String!
   timestamp: BigInt!
 }
 
-type BGTDelegation @entity {
-  id: ID!
-  vaultAddress: String! @index
-  validator: String!
-  queued: BigInt!
-  activated: BigInt!
+enum BGTDelegationState {
+  QUEUED
+  ACTIVATED
+  DROPPED
 }
 
-type VaultRewardsClaim @entity {
+type BGTDelegation @entity {
   id: ID!
-  vaultAddress: String! @index
-  stakingContract: String! @index
+  locker: String! @index
+  validator: String!
+  amount: BigInt!
+  state: BGTDelegationState!
   timestamp: BigInt!
+  queuedAtBlock: Int!
   transactionHash: String!
 }
 
 type XKDKFinalizedRedeem @entity {
   id: ID!
-  vaultAddress: String! @index
+  locker: String! @index
   amount: BigInt!
   timestamp: BigInt!
   transactionHash: String!
@@ -103,7 +169,7 @@ type XKDKFinalizedRedeem @entity {
 
 type XKDKRedeem @entity {
   id: ID!
-  vaultAddress: String! @index
+  locker: String! @index
   xKodiakAmount: BigInt!
   kodiakAmount: BigInt!
   duration: BigInt!
@@ -111,9 +177,9 @@ type XKDKRedeem @entity {
   transactionHash: String!
 }
 
-type VaultBalance @entity {
+type LockerBalance @entity {
   id: ID!
-  vaultAddress: String! @index
-  tokenAddress: String! @index
+  locker: String! @index
+  token: String! @index
   balance: BigInt!
 }

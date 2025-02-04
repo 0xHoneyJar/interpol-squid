@@ -1,4 +1,5 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, StringColumn as StringColumn_, Index as Index_, BigIntColumn as BigIntColumn_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, StringColumn as StringColumn_, Index as Index_, BigIntColumn as BigIntColumn_, IntColumn as IntColumn_} from "@subsquid/typeorm-store"
+import {BGTDelegationState} from "./_bgtDelegationState"
 
 @Entity_()
 export class BGTDelegation {
@@ -11,14 +12,23 @@ export class BGTDelegation {
 
     @Index_()
     @StringColumn_({nullable: false})
-    vaultAddress!: string
+    locker!: string
 
     @StringColumn_({nullable: false})
     validator!: string
 
     @BigIntColumn_({nullable: false})
-    queued!: bigint
+    amount!: bigint
+
+    @Column_("varchar", {length: 9, nullable: false})
+    state!: BGTDelegationState
 
     @BigIntColumn_({nullable: false})
-    activated!: bigint
+    timestamp!: bigint
+
+    @IntColumn_({nullable: false})
+    queuedAtBlock!: number
+
+    @StringColumn_({nullable: false})
+    transactionHash!: string
 }

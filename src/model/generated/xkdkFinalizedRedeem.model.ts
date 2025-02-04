@@ -11,7 +11,7 @@ export class XKDKFinalizedRedeem {
 
     @Index_()
     @StringColumn_({nullable: false})
-    vaultAddress!: string
+    locker!: string
 
     @BigIntColumn_({nullable: false})
     amount!: bigint

@@ -8,19 +8,21 @@ import {
 } from "@subsquid/evm-processor";
 import { assertNotNull } from "@subsquid/util-internal";
 import * as bgtAbi from "./abi/BGT"; // You'll need to add this ABI
-import * as factoryAbi from "./abi/Factory";
-import * as honeyVaultAbi from "./abi/HoneyVault";
+import * as honeyLockerAbi from "./abi/HoneyLocker";
+import * as lockerFactoryAbi from "./abi/LockerFactory";
 import * as xkdkAbi from "./abi/XKDK";
 //import * as kodiakAbi from "./abi/Kodiak"; // You'll need to add this ABI
 import * as erc20Abi from "./abi/ERC20"; // You'll need to add this ABI
-import { BGT_ADDRESS, FACTORY_ADDRESSES, XKDK_ADDRESS } from "./addresses";
+import { BGT_ADDRESS, FACTORY_ADDRESS, XKDK_ADDRESS } from "./addresses";
 
 export const processor = new EvmBatchProcessor()
-  .setGateway("https://v2.archive.subsquid.io/network/berachain-bartio")
-  .setRpcEndpoint({
-    url: assertNotNull(process.env.RPC_BERA_HTTP, "No RPC endpoint supplied"),
-  })
-  .setFinalityConfirmation(5)
+  .setPortal(
+    assertNotNull(
+      process.env.PORTAL_URL,
+      "Required env variable PORTAL_URL is missing"
+    )
+  )
+  .setFinalityConfirmation(20)
   .setFields({
     transaction: {
       from: true,
@@ -29,22 +31,26 @@ export const processor = new EvmBatchProcessor()
     },
   })
   .setBlockRange({
-    from: 4797717, // deployment block of factory
+    from: 8399404, // deployment block of factory
   })
   .addLog({
-    address: FACTORY_ADDRESSES, // Factory contract address
-    topic0: [factoryAbi.events.NewLocker.topic],
+    address: [FACTORY_ADDRESS], // Factory contract address
+    topic0: [lockerFactoryAbi.events.LockerFactory__NewLocker.topic],
   })
   .addLog({
     topic0: [
-      honeyVaultAbi.events.Initialized.topic,
-      honeyVaultAbi.events.Deposited.topic,
-      honeyVaultAbi.events.Withdrawn.topic,
-      honeyVaultAbi.events.LockedUntil.topic,
-      honeyVaultAbi.events.Staked.topic,
-      honeyVaultAbi.events.Unstaked.topic,
-      honeyVaultAbi.events.RewardsClaimed.topic,
-      honeyVaultAbi.events.OwnershipTransferred.topic,
+      honeyLockerAbi.events.HoneyLocker__Deposited.topic,
+      honeyLockerAbi.events.HoneyLocker__Withdrawn.topic,
+      honeyLockerAbi.events.HoneyLocker__LockedUntil.topic,
+      honeyLockerAbi.events.HoneyLocker__Staked.topic,
+      honeyLockerAbi.events.HoneyLocker__Unstaked.topic,
+      honeyLockerAbi.events.HoneyLocker__Claimed.topic,
+      honeyLockerAbi.events.HoneyLocker__Wildcard.topic,
+      honeyLockerAbi.events.HoneyLocker__OperatorSet.topic,
+      honeyLockerAbi.events.HoneyLocker__TreasurySet.topic,
+      honeyLockerAbi.events.HoneyLocker__AdapterRegistered.topic,
+      honeyLockerAbi.events.HoneyLocker__AdapterUpgraded.topic,
+      honeyLockerAbi.events.OwnershipTransferred.topic,
     ],
     transaction: true,
   })

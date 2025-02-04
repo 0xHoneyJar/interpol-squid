@@ -13,7 +13,7 @@ export class Fees {
     referral!: string
 
     @StringColumn_({nullable: false})
-    tokenAddress!: string
+    token!: string
 
     @BigIntColumn_({nullable: false})
     amount!: bigint

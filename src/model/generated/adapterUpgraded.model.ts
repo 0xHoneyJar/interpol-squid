@@ -1,8 +1,8 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, StringColumn as StringColumn_, Index as Index_, BigIntColumn as BigIntColumn_} from "@subsquid/typeorm-store"
 
 @Entity_()
-export class XKDKRedeem {
-    constructor(props?: Partial<XKDKRedeem>) {
+export class AdapterUpgraded {
+    constructor(props?: Partial<AdapterUpgraded>) {
         Object.assign(this, props)
     }
 
@@ -13,14 +13,11 @@ export class XKDKRedeem {
     @StringColumn_({nullable: false})
     locker!: string
 
-    @BigIntColumn_({nullable: false})
-    xKodiakAmount!: bigint
+    @StringColumn_({nullable: false})
+    protocol!: string
 
-    @BigIntColumn_({nullable: false})
-    kodiakAmount!: bigint
-
-    @BigIntColumn_({nullable: false})
-    duration!: bigint
+    @StringColumn_({nullable: false})
+    newImplementation!: string
 
     @BigIntColumn_({nullable: false})
     timestamp!: bigint
