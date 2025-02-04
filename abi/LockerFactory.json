@@ -17,6 +17,19 @@
   },
   {
     "type": "function",
+    "name": "beacon",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "cancelOwnershipHandover",
     "inputs": [],
     "outputs": [],
@@ -112,10 +125,10 @@
   },
   {
     "type": "function",
-    "name": "setLockerImplementation",
+    "name": "setBeacon",
     "inputs": [
       {
-        "name": "_lockerImplementation",
+        "name": "_beacon",
         "type": "address",
         "internalType": "address"
       }

@@ -49,7 +49,6 @@ export const processor = new EvmBatchProcessor()
       honeyLockerAbi.events.HoneyLocker__OperatorSet.topic,
       honeyLockerAbi.events.HoneyLocker__TreasurySet.topic,
       honeyLockerAbi.events.HoneyLocker__AdapterRegistered.topic,
-      honeyLockerAbi.events.HoneyLocker__AdapterUpgraded.topic,
       honeyLockerAbi.events.OwnershipTransferred.topic,
     ],
     transaction: true,

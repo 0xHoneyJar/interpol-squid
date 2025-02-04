@@ -1,7 +1,7 @@
 manifestVersion: subsquid.io/v0.1
-name: interpol-v2
-version: 2
-description: "Interpol v2 Squid"
+name: interpol-mainnet-v1
+version: 1
+description: "Interpol Mainnet v1 Squid"
 build:
 deploy:
   env:

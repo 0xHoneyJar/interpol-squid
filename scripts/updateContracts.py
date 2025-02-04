@@ -5,10 +5,13 @@ from pathlib import Path
 
 def updateAbis():
     contract_names = [
-        "AdapterFactory",
-        "HoneyLocker",
+        "HoneyLocker", 
         "LockerFactory",
         "HoneyQueen",
+        "KodiakAdapter",
+        "BeradromeAdapter",
+        "InfraredAdapter",
+        "BGTStationAdapter",
     ]
 
     abi_dir = Path("abi")
@@ -27,11 +30,14 @@ def updateAbis():
                 if abi is None:
                     print(f"Warning: No ABI found in {input_path}")
                     continue
+                
                 # Output file path
                 output_path = abi_dir / f"{name}.json"
-                # Write the ABI to the output file
+                
+                # Write the ABI as json file
                 with open(output_path, 'w') as f:
                     json.dump(abi, f, indent=2)
+                    
                 print(f"Successfully extracted ABI for {name}")
                 
         except FileNotFoundError:
@@ -43,13 +49,13 @@ def updateAbis():
 
 def updateAddresses():
     # Read addresses file
-    addresses_file = Path("src/addresses.ts")
+    contracts_file = Path("src/addresses.ts")
 
     current_dir = os.getcwd()
     interpol_dir = Path(current_dir).parent / "interpol"
 
     # Read testnet config
-    config_path = interpol_dir / "script" / "testnet.config.json"
+    config_path = interpol_dir / "script" / "mainnet.config.json"
     with open(config_path) as f:
         config = json.load(f)
 
@@ -57,17 +63,18 @@ def updateAddresses():
     honeyqueen_addr = config["honeyqueen"]
     factory_addr = config["lockerFactory"]
 
-    # Read current addresses.ts content
-    with open(addresses_file) as f:
+    print(f"Honeyqueen address: {honeyqueen_addr}")
+    print(f"Factory address: {factory_addr}")
+
+    with open(contracts_file) as f:
         content = f.read()
 
     # Update addresses using regex
     import re
-    content = re.sub(r'(FACTORY_ADDRESS = )"[^"]*"', f'\\1"{factory_addr}"', content)
+    content = re.sub(r'(LOCKER_FACTORY_ADDRESS = )"[^"]*"', f'\\1"{factory_addr}"', content)
     content = re.sub(r'(HONEYQUEEN_ADDRESS = )"[^"]*"', f'\\1"{honeyqueen_addr}"', content)
-
     # Write updated content
-    with open(addresses_file, 'w') as f:
+    with open(contracts_file, 'w') as f:
         f.write(content)
 
     print("Successfully updated addresses")
@@ -75,3 +82,13 @@ def updateAddresses():
 if __name__ == "__main__":
     updateAbis()
     updateAddresses()
+    try:
+        import subprocess
+        print("Running sqd commands...")
+        subprocess.run(["sqd", "codegen"], check=True)
+        subprocess.run(["sqd", "typegen"], check=True)
+        print("Successfully ran sqd commands")
+    except subprocess.CalledProcessError as e:
+        print(f"Error running sqd commands: {e}")
+    except Exception as e:
+        print(f"Unexpected error running sqd commands: {e}")

@@ -10,6 +10,7 @@ export const events = {
 }
 
 export const functions = {
+    beacon: viewFun("0x59659e90", "beacon()", {}, p.address),
     cancelOwnershipHandover: fun("0x54d1f13d", "cancelOwnershipHandover()", {}, ),
     completeOwnershipHandover: fun("0xf04e283e", "completeOwnershipHandover(address)", {"pendingOwner": p.address}, ),
     createLocker: fun("0xbb569bad", "createLocker(address,address,bool)", {"_owner": p.address, "_referral": p.address, "_unlocked": p.bool}, p.address),
@@ -17,11 +18,15 @@ export const functions = {
     ownershipHandoverExpiresAt: viewFun("0xfee81cf4", "ownershipHandoverExpiresAt(address)", {"pendingOwner": p.address}, p.uint256),
     renounceOwnership: fun("0x715018a6", "renounceOwnership()", {}, ),
     requestOwnershipHandover: fun("0x25692962", "requestOwnershipHandover()", {}, ),
-    setLockerImplementation: fun("0x76f33454", "setLockerImplementation(address)", {"_lockerImplementation": p.address}, ),
+    setBeacon: fun("0xd42afb56", "setBeacon(address)", {"_beacon": p.address}, ),
     transferOwnership: fun("0xf2fde38b", "transferOwnership(address)", {"newOwner": p.address}, ),
 }
 
 export class Contract extends ContractBase {
+
+    beacon() {
+        return this.eth_call(functions.beacon, {})
+    }
 
     owner() {
         return this.eth_call(functions.owner, {})
@@ -39,6 +44,9 @@ export type OwnershipHandoverRequestedEventArgs = EParams<typeof events.Ownershi
 export type OwnershipTransferredEventArgs = EParams<typeof events.OwnershipTransferred>
 
 /// Function types
+export type BeaconParams = FunctionArguments<typeof functions.beacon>
+export type BeaconReturn = FunctionReturn<typeof functions.beacon>
+
 export type CancelOwnershipHandoverParams = FunctionArguments<typeof functions.cancelOwnershipHandover>
 export type CancelOwnershipHandoverReturn = FunctionReturn<typeof functions.cancelOwnershipHandover>
 
@@ -60,8 +68,8 @@ export type RenounceOwnershipReturn = FunctionReturn<typeof functions.renounceOw
 export type RequestOwnershipHandoverParams = FunctionArguments<typeof functions.requestOwnershipHandover>
 export type RequestOwnershipHandoverReturn = FunctionReturn<typeof functions.requestOwnershipHandover>
 
-export type SetLockerImplementationParams = FunctionArguments<typeof functions.setLockerImplementation>
-export type SetLockerImplementationReturn = FunctionReturn<typeof functions.setLockerImplementation>
+export type SetBeaconParams = FunctionArguments<typeof functions.setBeacon>
+export type SetBeaconReturn = FunctionReturn<typeof functions.setBeacon>
 
 export type TransferOwnershipParams = FunctionArguments<typeof functions.transferOwnership>
 export type TransferOwnershipReturn = FunctionReturn<typeof functions.transferOwnership>

@@ -1,5 +1,10 @@
 [
   {
+    "type": "constructor",
+    "inputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
     "type": "receive",
     "stateMutability": "payable"
   },
@@ -9,8 +14,8 @@
     "inputs": [
       {
         "name": "validator",
-        "type": "address",
-        "internalType": "address"
+        "type": "bytes",
+        "internalType": "bytes"
       }
     ],
     "outputs": [],
@@ -50,10 +55,21 @@
   },
   {
     "type": "function",
-    "name": "cancelOwnershipHandover",
-    "inputs": [],
+    "name": "cancelDropBoost",
+    "inputs": [
+      {
+        "name": "amount",
+        "type": "uint128",
+        "internalType": "uint128"
+      },
+      {
+        "name": "validator",
+        "type": "bytes",
+        "internalType": "bytes"
+      }
+    ],
     "outputs": [],
-    "stateMutability": "payable"
+    "stateMutability": "nonpayable"
   },
   {
     "type": "function",
@@ -66,8 +82,8 @@
       },
       {
         "name": "validator",
-        "type": "address",
-        "internalType": "address"
+        "type": "bytes",
+        "internalType": "bytes"
       }
     ],
     "outputs": [],
@@ -83,46 +99,51 @@
         "internalType": "address"
       }
     ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "claimBGT",
-    "inputs": [
+    "outputs": [
       {
-        "name": "vault",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "completeOwnershipHandover",
-    "inputs": [
-      {
-        "name": "pendingOwner",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "payable"
-  },
-  {
-    "type": "function",
-    "name": "delegateBGT",
-    "inputs": [
-      {
-        "name": "amount",
-        "type": "uint128",
-        "internalType": "uint128"
+        "name": "",
+        "type": "address[]",
+        "internalType": "address[]"
       },
       {
-        "name": "validator",
+        "name": "",
+        "type": "uint256[]",
+        "internalType": "uint256[]"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "claimBGTRewards",
+    "inputs": [],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "claimFeesOfLP",
+    "inputs": [
+      {
+        "name": "_LPToken",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "_tokenId",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "delegate",
+    "inputs": [
+      {
+        "name": "delegatee",
         "type": "address",
         "internalType": "address"
       }
@@ -164,8 +185,8 @@
       },
       {
         "name": "validator",
-        "type": "address",
-        "internalType": "address"
+        "type": "bytes",
+        "internalType": "bytes"
       }
     ],
     "outputs": [],
@@ -205,19 +226,6 @@
   },
   {
     "type": "function",
-    "name": "implementation",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
     "name": "initialize",
     "inputs": [
       {
@@ -246,6 +254,118 @@
   },
   {
     "type": "function",
+    "name": "onERC1155BatchReceived",
+    "inputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "",
+        "type": "uint256[]",
+        "internalType": "uint256[]"
+      },
+      {
+        "name": "",
+        "type": "uint256[]",
+        "internalType": "uint256[]"
+      },
+      {
+        "name": "",
+        "type": "bytes",
+        "internalType": "bytes"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bytes4",
+        "internalType": "bytes4"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "onERC1155Received",
+    "inputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "",
+        "type": "bytes",
+        "internalType": "bytes"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bytes4",
+        "internalType": "bytes4"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "onERC721Received",
+    "inputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "",
+        "type": "bytes",
+        "internalType": "bytes"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bytes4",
+        "internalType": "bytes4"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
     "name": "operator",
     "inputs": [],
     "outputs": [
@@ -263,7 +383,7 @@
     "inputs": [],
     "outputs": [
       {
-        "name": "result",
+        "name": "",
         "type": "address",
         "internalType": "address"
       }
@@ -272,22 +392,39 @@
   },
   {
     "type": "function",
-    "name": "ownershipHandoverExpiresAt",
+    "name": "queueBoost",
     "inputs": [
       {
-        "name": "pendingOwner",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "outputs": [
+        "name": "amount",
+        "type": "uint128",
+        "internalType": "uint128"
+      },
       {
-        "name": "result",
-        "type": "uint256",
-        "internalType": "uint256"
+        "name": "validator",
+        "type": "bytes",
+        "internalType": "bytes"
       }
     ],
-    "stateMutability": "view"
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "queueDropBoost",
+    "inputs": [
+      {
+        "name": "amount",
+        "type": "uint128",
+        "internalType": "uint128"
+      },
+      {
+        "name": "validator",
+        "type": "bytes",
+        "internalType": "bytes"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
   },
   {
     "type": "function",
@@ -333,14 +470,7 @@
     "name": "renounceOwnership",
     "inputs": [],
     "outputs": [],
-    "stateMutability": "payable"
-  },
-  {
-    "type": "function",
-    "name": "requestOwnershipHandover",
-    "inputs": [],
-    "outputs": [],
-    "stateMutability": "payable"
+    "stateMutability": "nonpayable"
   },
   {
     "type": "function",
@@ -416,7 +546,7 @@
       }
     ],
     "outputs": [],
-    "stateMutability": "payable"
+    "stateMutability": "nonpayable"
   },
   {
     "type": "function",
@@ -464,26 +594,6 @@
   },
   {
     "type": "function",
-    "name": "upgradeAdapter",
-    "inputs": [
-      {
-        "name": "protocol",
-        "type": "string",
-        "internalType": "string"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "upgradeLocker",
-    "inputs": [],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
     "name": "vaultLPStaked",
     "inputs": [
       {
@@ -508,8 +618,8 @@
     "outputs": [
       {
         "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
+        "type": "string",
+        "internalType": "string"
       }
     ],
     "stateMutability": "pure"
@@ -653,25 +763,6 @@
   },
   {
     "type": "event",
-    "name": "HoneyLocker__AdapterUpgraded",
-    "inputs": [
-      {
-        "name": "protocol",
-        "type": "string",
-        "indexed": true,
-        "internalType": "string"
-      },
-      {
-        "name": "newImplementation",
-        "type": "address",
-        "indexed": false,
-        "internalType": "address"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
     "name": "HoneyLocker__Claimed",
     "inputs": [
       {
@@ -688,6 +779,31 @@
       },
       {
         "name": "amount",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "HoneyLocker__ClaimedFeesOfLP",
+    "inputs": [
+      {
+        "name": "LPToken",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "amount0",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "amount1",
         "type": "uint256",
         "indexed": false,
         "internalType": "uint256"
@@ -811,25 +927,6 @@
   },
   {
     "type": "event",
-    "name": "HoneyLocker__Upgraded",
-    "inputs": [
-      {
-        "name": "oldImplementation",
-        "type": "address",
-        "indexed": false,
-        "internalType": "address"
-      },
-      {
-        "name": "newImplementation",
-        "type": "address",
-        "indexed": false,
-        "internalType": "address"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
     "name": "HoneyLocker__Wildcard",
     "inputs": [
       {
@@ -874,26 +971,13 @@
   },
   {
     "type": "event",
-    "name": "OwnershipHandoverCanceled",
+    "name": "Initialized",
     "inputs": [
       {
-        "name": "pendingOwner",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "OwnershipHandoverRequested",
-    "inputs": [
-      {
-        "name": "pendingOwner",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
+        "name": "version",
+        "type": "uint64",
+        "indexed": false,
+        "internalType": "uint64"
       }
     ],
     "anonymous": false
@@ -903,7 +987,7 @@
     "name": "OwnershipTransferred",
     "inputs": [
       {
-        "name": "oldOwner",
+        "name": "previousOwner",
         "type": "address",
         "indexed": true,
         "internalType": "address"
@@ -916,56 +1000,6 @@
       }
     ],
     "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "Upgraded",
-    "inputs": [
-      {
-        "name": "implementation",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "error",
-    "name": "AddressEmptyCode",
-    "inputs": [
-      {
-        "name": "target",
-        "type": "address",
-        "internalType": "address"
-      }
-    ]
-  },
-  {
-    "type": "error",
-    "name": "AlreadyInitialized",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "ERC1967InvalidImplementation",
-    "inputs": [
-      {
-        "name": "implementation",
-        "type": "address",
-        "internalType": "address"
-      }
-    ]
-  },
-  {
-    "type": "error",
-    "name": "ERC1967NonPayable",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "FailedCall",
-    "inputs": []
   },
   {
     "type": "error",
@@ -984,12 +1018,22 @@
   },
   {
     "type": "error",
+    "name": "HoneyLocker__ExpirationMustBeGreaterThanZero",
+    "inputs": []
+  },
+  {
+    "type": "error",
     "name": "HoneyLocker__ExpirationNotMatching",
     "inputs": []
   },
   {
     "type": "error",
     "name": "HoneyLocker__HasToBeLPToken",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "HoneyLocker__NotAuthorized",
     "inputs": []
   },
   {
@@ -1014,17 +1058,45 @@
   },
   {
     "type": "error",
-    "name": "NewOwnerIsZeroAddress",
+    "name": "InvalidInitialization",
     "inputs": []
   },
   {
     "type": "error",
-    "name": "NoHandoverRequest",
+    "name": "NotInitializing",
     "inputs": []
   },
   {
     "type": "error",
-    "name": "Unauthorized",
-    "inputs": []
+    "name": "OwnableInvalidOwner",
+    "inputs": [
+      {
+        "name": "owner",
+        "type": "address",
+        "internalType": "address"
+      }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "OwnableUnauthorizedAccount",
+    "inputs": [
+      {
+        "name": "account",
+        "type": "address",
+        "internalType": "address"
+      }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "SafeERC20FailedOperation",
+    "inputs": [
+      {
+        "name": "token",
+        "type": "address",
+        "internalType": "address"
+      }
+    ]
   }
 ]

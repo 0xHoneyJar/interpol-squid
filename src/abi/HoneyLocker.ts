@@ -4,47 +4,46 @@ import type { EventParams as EParams, FunctionArguments, FunctionReturn } from '
 
 export const events = {
     HoneyLocker__AdapterRegistered: event("0x21f7adbcf0a252b6201977540191880dfba320615340274613c2031f93a14534", "HoneyLocker__AdapterRegistered(string,address)", {"protocol": indexed(p.string), "adapter": p.address}),
-    HoneyLocker__AdapterUpgraded: event("0xf35706fddc9f159983b59a34d47acd60fff8fe159e55c38c1a6cb3c7748c1d8a", "HoneyLocker__AdapterUpgraded(string,address)", {"protocol": indexed(p.string), "newImplementation": p.address}),
     HoneyLocker__Claimed: event("0x4d47b0d98037344ecb5a6c8991f791589b339dd4838404ec8cc98c6c5163997d", "HoneyLocker__Claimed(address,address,uint256)", {"vault": indexed(p.address), "rewardToken": indexed(p.address), "amount": p.uint256}),
+    HoneyLocker__ClaimedFeesOfLP: event("0xb0dff37222ba4e89efe2533faadab28399a747de2f3f5821087660455c86410c", "HoneyLocker__ClaimedFeesOfLP(address,uint256,uint256)", {"LPToken": indexed(p.address), "amount0": p.uint256, "amount1": p.uint256}),
     HoneyLocker__Deposited: event("0x2a4123c00a67c6c2dd2ba7f70f84f4e7ddbdc6825ba8c567d68c6223720e5a11", "HoneyLocker__Deposited(address,uint256)", {"LPToken": indexed(p.address), "amountOrId": p.uint256}),
     HoneyLocker__LockedUntil: event("0x895c7fd3a25a9996f37edb555ba8f6eda2373b30f31b23153e5b6f9eb5e2c8e5", "HoneyLocker__LockedUntil(address,uint256)", {"LPToken": indexed(p.address), "expiration": p.uint256}),
     HoneyLocker__OperatorSet: event("0xdd7d2b400bfd18320bf3e32ec833e44712e98becb73ce95021c84472d07f60d3", "HoneyLocker__OperatorSet(address)", {"operator": indexed(p.address)}),
     HoneyLocker__Staked: event("0xb79e28292a8aeda2cc4b0796574e8e910b4b2bdd20da4618ba031be8904642c4", "HoneyLocker__Staked(address,address,uint256)", {"vault": indexed(p.address), "LPToken": indexed(p.address), "amountOrId": p.uint256}),
     HoneyLocker__TreasurySet: event("0x1cfd57337acaaed7c247ecca0f8fdfdf9d9e397ef5dafd91b72f4127969d9711", "HoneyLocker__TreasurySet(address)", {"treasury": indexed(p.address)}),
     HoneyLocker__Unstaked: event("0x3fbddeb8cf191a7224b036f2936759a3c73ed98a41ca294185cd751552f540f1", "HoneyLocker__Unstaked(address,address,uint256)", {"vault": indexed(p.address), "LPToken": indexed(p.address), "amountOrId": p.uint256}),
-    HoneyLocker__Upgraded: event("0x15ac7b00fd4664d84bd89029d3f6c215d5edf88a90fe39debb317bbd6f13f73f", "HoneyLocker__Upgraded(address,address)", {"oldImplementation": p.address, "newImplementation": p.address}),
     HoneyLocker__Wildcard: event("0xf7f0ed0f2b94710cb25d12685d78341088499642c3e4e629c8b29274bc020857", "HoneyLocker__Wildcard(address,uint8,bytes)", {"vault": indexed(p.address), "func": indexed(p.uint8), "args": p.bytes}),
     HoneyLocker__Withdrawn: event("0x3d2663eb759e4c9d27f9e857a4f4bab24e85612c773ea268d88c010e89f48dc2", "HoneyLocker__Withdrawn(address,uint256)", {"LPToken": indexed(p.address), "amountOrId": p.uint256}),
-    OwnershipHandoverCanceled: event("0xfa7b8eab7da67f412cc9575ed43464468f9bfbae89d1675917346ca6d8fe3c92", "OwnershipHandoverCanceled(address)", {"pendingOwner": indexed(p.address)}),
-    OwnershipHandoverRequested: event("0xdbf36a107da19e49527a7176a1babf963b4b0ff8cde35ee35d6cd8f1f9ac7e1d", "OwnershipHandoverRequested(address)", {"pendingOwner": indexed(p.address)}),
-    OwnershipTransferred: event("0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0", "OwnershipTransferred(address,address)", {"oldOwner": indexed(p.address), "newOwner": indexed(p.address)}),
-    Upgraded: event("0xbc7cd75a20ee27fd9adebab32041f755214dbc6bffa90cc0225b39da2e5c2d3b", "Upgraded(address)", {"implementation": indexed(p.address)}),
+    Initialized: event("0xc7f505b2f371ae2175ee4913f4499e1f2633a7b5936321eed1cdaeb6115181d2", "Initialized(uint64)", {"version": p.uint64}),
+    OwnershipTransferred: event("0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0", "OwnershipTransferred(address,address)", {"previousOwner": indexed(p.address), "newOwner": indexed(p.address)}),
 }
 
 export const functions = {
-    activateBoost: fun("0x95c0e232", "activateBoost(address)", {"validator": p.address}, ),
+    activateBoost: fun("0x95195fd9", "activateBoost(bytes)", {"validator": p.bytes}, ),
     adapterOfProtocol: viewFun("0xb1a3fdd1", "adapterOfProtocol(string)", {"protocol": p.string}, p.address),
     burnBGTForBERA: fun("0x45d514e9", "burnBGTForBERA(uint256)", {"_amount": p.uint256}, ),
-    cancelOwnershipHandover: fun("0x54d1f13d", "cancelOwnershipHandover()", {}, ),
-    cancelQueuedBoost: fun("0x66b35e98", "cancelQueuedBoost(uint128,address)", {"amount": p.uint128, "validator": p.address}, ),
-    claim: fun("0x1e83409a", "claim(address)", {"vault": p.address}, ),
-    claimBGT: fun("0x3600e6bc", "claimBGT(address)", {"vault": p.address}, ),
-    completeOwnershipHandover: fun("0xf04e283e", "completeOwnershipHandover(address)", {"pendingOwner": p.address}, ),
-    delegateBGT: fun("0x913a561b", "delegateBGT(uint128,address)", {"amount": p.uint128, "validator": p.address}, ),
+    cancelDropBoost: fun("0x14ae4e87", "cancelDropBoost(uint128,bytes)", {"amount": p.uint128, "validator": p.bytes}, ),
+    cancelQueuedBoost: fun("0x66cc8439", "cancelQueuedBoost(uint128,bytes)", {"amount": p.uint128, "validator": p.bytes}, ),
+    claim: fun("0x1e83409a", "claim(address)", {"vault": p.address}, {"_0": p.array(p.address), "_1": p.array(p.uint256)}),
+    claimBGTRewards: fun("0x4c7beee9", "claimBGTRewards()", {}, ),
+    claimFeesOfLP: fun("0x049f4b08", "claimFeesOfLP(address,uint256)", {"_LPToken": p.address, "_tokenId": p.uint256}, ),
+    delegate: fun("0x5c19a95c", "delegate(address)", {"delegatee": p.address}, ),
     depositAndLock: fun("0xa6da1e7d", "depositAndLock(address,uint256,uint256)", {"_LPToken": p.address, "_amountOrId": p.uint256, "_expiration": p.uint256}, ),
-    dropBoost: fun("0x1db6c3a1", "dropBoost(uint128,address)", {"amount": p.uint128, "validator": p.address}, ),
+    dropBoost: fun("0xbb09720a", "dropBoost(uint128,bytes)", {"amount": p.uint128, "validator": p.bytes}, ),
     expirations: viewFun("0x3c74db0f", "expirations(address)", {"LPToken": p.address}, p.uint256),
     honeyQueen: viewFun("0xee9ec831", "honeyQueen()", {}, p.address),
-    implementation: viewFun("0x5c60da1b", "implementation()", {}, p.address),
     initialize: fun("0xfecf9734", "initialize(address,address,address,bool)", {"_honeyQueen": p.address, "_owner": p.address, "_referrer": p.address, "_unlocked": p.bool}, ),
+    onERC1155BatchReceived: viewFun("0xbc197c81", "onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)", {"_0": p.address, "_1": p.address, "_2": p.array(p.uint256), "_3": p.array(p.uint256), "_4": p.bytes}, p.bytes4),
+    onERC1155Received: viewFun("0xf23a6e61", "onERC1155Received(address,address,uint256,uint256,bytes)", {"_0": p.address, "_1": p.address, "_2": p.uint256, "_3": p.uint256, "_4": p.bytes}, p.bytes4),
+    onERC721Received: viewFun("0x150b7a02", "onERC721Received(address,address,uint256,bytes)", {"_0": p.address, "_1": p.address, "_2": p.uint256, "_3": p.bytes}, p.bytes4),
     operator: viewFun("0x570ca735", "operator()", {}, p.address),
     owner: viewFun("0x8da5cb5b", "owner()", {}, p.address),
-    ownershipHandoverExpiresAt: viewFun("0xfee81cf4", "ownershipHandoverExpiresAt(address)", {"pendingOwner": p.address}, p.uint256),
+    queueBoost: fun("0x5a52c3f3", "queueBoost(uint128,bytes)", {"amount": p.uint128, "validator": p.bytes}, ),
+    queueDropBoost: fun("0x8ce7545d", "queueDropBoost(uint128,bytes)", {"amount": p.uint128, "validator": p.bytes}, ),
     recipient: viewFun("0x66d003ac", "recipient()", {}, p.address),
     referrer: viewFun("0x68447c93", "referrer()", {}, p.address),
     registerAdapter: fun("0x7179fd7d", "registerAdapter(string)", {"protocol": p.string}, ),
     renounceOwnership: fun("0x715018a6", "renounceOwnership()", {}, ),
-    requestOwnershipHandover: fun("0x25692962", "requestOwnershipHandover()", {}, ),
     setOperator: fun("0xb3ab15fb", "setOperator(address)", {"_operator": p.address}, ),
     setTreasury: fun("0xf0f44260", "setTreasury(address)", {"_treasury": p.address}, ),
     stake: fun("0xadc9772e", "stake(address,uint256)", {"vault": p.address, "amount": p.uint256}, ),
@@ -53,10 +52,8 @@ export const functions = {
     treasury: viewFun("0x61d027b3", "treasury()", {}, p.address),
     unlocked: viewFun("0x6a5e2650", "unlocked()", {}, p.bool),
     unstake: fun("0xc2a672e0", "unstake(address,uint256)", {"vault": p.address, "amount": p.uint256}, ),
-    upgradeAdapter: fun("0xc808a7ee", "upgradeAdapter(string)", {"protocol": p.string}, ),
-    upgradeLocker: fun("0xf8ae0485", "upgradeLocker()", {}, ),
     vaultLPStaked: viewFun("0x104ddd07", "vaultLPStaked(address)", {"vault": p.address}, p.uint256),
-    version: viewFun("0x54fd4d50", "version()", {}, p.uint256),
+    version: viewFun("0x54fd4d50", "version()", {}, p.string),
     wildcard: fun("0xedb4b5cf", "wildcard(address,uint8,bytes)", {"vault": p.address, "func": p.uint8, "args": p.bytes}, ),
     withdrawBERA: fun("0x3a1f406c", "withdrawBERA(uint256)", {"_amount": p.uint256}, ),
     withdrawERC1155: fun("0xa1538bde", "withdrawERC1155(address,uint256,uint256,bytes)", {"_token": p.address, "_id": p.uint256, "_amount": p.uint256, "_data": p.bytes}, ),
@@ -79,8 +76,16 @@ export class Contract extends ContractBase {
         return this.eth_call(functions.honeyQueen, {})
     }
 
-    implementation() {
-        return this.eth_call(functions.implementation, {})
+    onERC1155BatchReceived(_0: OnERC1155BatchReceivedParams["_0"], _1: OnERC1155BatchReceivedParams["_1"], _2: OnERC1155BatchReceivedParams["_2"], _3: OnERC1155BatchReceivedParams["_3"], _4: OnERC1155BatchReceivedParams["_4"]) {
+        return this.eth_call(functions.onERC1155BatchReceived, {_0, _1, _2, _3, _4})
+    }
+
+    onERC1155Received(_0: OnERC1155ReceivedParams["_0"], _1: OnERC1155ReceivedParams["_1"], _2: OnERC1155ReceivedParams["_2"], _3: OnERC1155ReceivedParams["_3"], _4: OnERC1155ReceivedParams["_4"]) {
+        return this.eth_call(functions.onERC1155Received, {_0, _1, _2, _3, _4})
+    }
+
+    onERC721Received(_0: OnERC721ReceivedParams["_0"], _1: OnERC721ReceivedParams["_1"], _2: OnERC721ReceivedParams["_2"], _3: OnERC721ReceivedParams["_3"]) {
+        return this.eth_call(functions.onERC721Received, {_0, _1, _2, _3})
     }
 
     operator() {
@@ -89,10 +94,6 @@ export class Contract extends ContractBase {
 
     owner() {
         return this.eth_call(functions.owner, {})
-    }
-
-    ownershipHandoverExpiresAt(pendingOwner: OwnershipHandoverExpiresAtParams["pendingOwner"]) {
-        return this.eth_call(functions.ownershipHandoverExpiresAt, {pendingOwner})
     }
 
     recipient() {
@@ -126,21 +127,18 @@ export class Contract extends ContractBase {
 
 /// Event types
 export type HoneyLocker__AdapterRegisteredEventArgs = EParams<typeof events.HoneyLocker__AdapterRegistered>
-export type HoneyLocker__AdapterUpgradedEventArgs = EParams<typeof events.HoneyLocker__AdapterUpgraded>
 export type HoneyLocker__ClaimedEventArgs = EParams<typeof events.HoneyLocker__Claimed>
+export type HoneyLocker__ClaimedFeesOfLPEventArgs = EParams<typeof events.HoneyLocker__ClaimedFeesOfLP>
 export type HoneyLocker__DepositedEventArgs = EParams<typeof events.HoneyLocker__Deposited>
 export type HoneyLocker__LockedUntilEventArgs = EParams<typeof events.HoneyLocker__LockedUntil>
 export type HoneyLocker__OperatorSetEventArgs = EParams<typeof events.HoneyLocker__OperatorSet>
 export type HoneyLocker__StakedEventArgs = EParams<typeof events.HoneyLocker__Staked>
 export type HoneyLocker__TreasurySetEventArgs = EParams<typeof events.HoneyLocker__TreasurySet>
 export type HoneyLocker__UnstakedEventArgs = EParams<typeof events.HoneyLocker__Unstaked>
-export type HoneyLocker__UpgradedEventArgs = EParams<typeof events.HoneyLocker__Upgraded>
 export type HoneyLocker__WildcardEventArgs = EParams<typeof events.HoneyLocker__Wildcard>
 export type HoneyLocker__WithdrawnEventArgs = EParams<typeof events.HoneyLocker__Withdrawn>
-export type OwnershipHandoverCanceledEventArgs = EParams<typeof events.OwnershipHandoverCanceled>
-export type OwnershipHandoverRequestedEventArgs = EParams<typeof events.OwnershipHandoverRequested>
+export type InitializedEventArgs = EParams<typeof events.Initialized>
 export type OwnershipTransferredEventArgs = EParams<typeof events.OwnershipTransferred>
-export type UpgradedEventArgs = EParams<typeof events.Upgraded>
 
 /// Function types
 export type ActivateBoostParams = FunctionArguments<typeof functions.activateBoost>
@@ -152,8 +150,8 @@ export type AdapterOfProtocolReturn = FunctionReturn<typeof functions.adapterOfP
 export type BurnBGTForBERAParams = FunctionArguments<typeof functions.burnBGTForBERA>
 export type BurnBGTForBERAReturn = FunctionReturn<typeof functions.burnBGTForBERA>
 
-export type CancelOwnershipHandoverParams = FunctionArguments<typeof functions.cancelOwnershipHandover>
-export type CancelOwnershipHandoverReturn = FunctionReturn<typeof functions.cancelOwnershipHandover>
+export type CancelDropBoostParams = FunctionArguments<typeof functions.cancelDropBoost>
+export type CancelDropBoostReturn = FunctionReturn<typeof functions.cancelDropBoost>
 
 export type CancelQueuedBoostParams = FunctionArguments<typeof functions.cancelQueuedBoost>
 export type CancelQueuedBoostReturn = FunctionReturn<typeof functions.cancelQueuedBoost>
@@ -161,14 +159,14 @@ export type CancelQueuedBoostReturn = FunctionReturn<typeof functions.cancelQueu
 export type ClaimParams = FunctionArguments<typeof functions.claim>
 export type ClaimReturn = FunctionReturn<typeof functions.claim>
 
-export type ClaimBGTParams = FunctionArguments<typeof functions.claimBGT>
-export type ClaimBGTReturn = FunctionReturn<typeof functions.claimBGT>
+export type ClaimBGTRewardsParams = FunctionArguments<typeof functions.claimBGTRewards>
+export type ClaimBGTRewardsReturn = FunctionReturn<typeof functions.claimBGTRewards>
 
-export type CompleteOwnershipHandoverParams = FunctionArguments<typeof functions.completeOwnershipHandover>
-export type CompleteOwnershipHandoverReturn = FunctionReturn<typeof functions.completeOwnershipHandover>
+export type ClaimFeesOfLPParams = FunctionArguments<typeof functions.claimFeesOfLP>
+export type ClaimFeesOfLPReturn = FunctionReturn<typeof functions.claimFeesOfLP>
 
-export type DelegateBGTParams = FunctionArguments<typeof functions.delegateBGT>
-export type DelegateBGTReturn = FunctionReturn<typeof functions.delegateBGT>
+export type DelegateParams = FunctionArguments<typeof functions.delegate>
+export type DelegateReturn = FunctionReturn<typeof functions.delegate>
 
 export type DepositAndLockParams = FunctionArguments<typeof functions.depositAndLock>
 export type DepositAndLockReturn = FunctionReturn<typeof functions.depositAndLock>
@@ -182,11 +180,17 @@ export type ExpirationsReturn = FunctionReturn<typeof functions.expirations>
 export type HoneyQueenParams = FunctionArguments<typeof functions.honeyQueen>
 export type HoneyQueenReturn = FunctionReturn<typeof functions.honeyQueen>
 
-export type ImplementationParams = FunctionArguments<typeof functions.implementation>
-export type ImplementationReturn = FunctionReturn<typeof functions.implementation>
-
 export type InitializeParams = FunctionArguments<typeof functions.initialize>
 export type InitializeReturn = FunctionReturn<typeof functions.initialize>
+
+export type OnERC1155BatchReceivedParams = FunctionArguments<typeof functions.onERC1155BatchReceived>
+export type OnERC1155BatchReceivedReturn = FunctionReturn<typeof functions.onERC1155BatchReceived>
+
+export type OnERC1155ReceivedParams = FunctionArguments<typeof functions.onERC1155Received>
+export type OnERC1155ReceivedReturn = FunctionReturn<typeof functions.onERC1155Received>
+
+export type OnERC721ReceivedParams = FunctionArguments<typeof functions.onERC721Received>
+export type OnERC721ReceivedReturn = FunctionReturn<typeof functions.onERC721Received>
 
 export type OperatorParams = FunctionArguments<typeof functions.operator>
 export type OperatorReturn = FunctionReturn<typeof functions.operator>
@@ -194,8 +198,11 @@ export type OperatorReturn = FunctionReturn<typeof functions.operator>
 export type OwnerParams = FunctionArguments<typeof functions.owner>
 export type OwnerReturn = FunctionReturn<typeof functions.owner>
 
-export type OwnershipHandoverExpiresAtParams = FunctionArguments<typeof functions.ownershipHandoverExpiresAt>
-export type OwnershipHandoverExpiresAtReturn = FunctionReturn<typeof functions.ownershipHandoverExpiresAt>
+export type QueueBoostParams = FunctionArguments<typeof functions.queueBoost>
+export type QueueBoostReturn = FunctionReturn<typeof functions.queueBoost>
+
+export type QueueDropBoostParams = FunctionArguments<typeof functions.queueDropBoost>
+export type QueueDropBoostReturn = FunctionReturn<typeof functions.queueDropBoost>
 
 export type RecipientParams = FunctionArguments<typeof functions.recipient>
 export type RecipientReturn = FunctionReturn<typeof functions.recipient>
@@ -208,9 +215,6 @@ export type RegisterAdapterReturn = FunctionReturn<typeof functions.registerAdap
 
 export type RenounceOwnershipParams = FunctionArguments<typeof functions.renounceOwnership>
 export type RenounceOwnershipReturn = FunctionReturn<typeof functions.renounceOwnership>
-
-export type RequestOwnershipHandoverParams = FunctionArguments<typeof functions.requestOwnershipHandover>
-export type RequestOwnershipHandoverReturn = FunctionReturn<typeof functions.requestOwnershipHandover>
 
 export type SetOperatorParams = FunctionArguments<typeof functions.setOperator>
 export type SetOperatorReturn = FunctionReturn<typeof functions.setOperator>
@@ -235,12 +239,6 @@ export type UnlockedReturn = FunctionReturn<typeof functions.unlocked>
 
 export type UnstakeParams = FunctionArguments<typeof functions.unstake>
 export type UnstakeReturn = FunctionReturn<typeof functions.unstake>
-
-export type UpgradeAdapterParams = FunctionArguments<typeof functions.upgradeAdapter>
-export type UpgradeAdapterReturn = FunctionReturn<typeof functions.upgradeAdapter>
-
-export type UpgradeLockerParams = FunctionArguments<typeof functions.upgradeLocker>
-export type UpgradeLockerReturn = FunctionReturn<typeof functions.upgradeLocker>
 
 export type VaultLPStakedParams = FunctionArguments<typeof functions.vaultLPStaked>
 export type VaultLPStakedReturn = FunctionReturn<typeof functions.vaultLPStaked>

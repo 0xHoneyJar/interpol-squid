@@ -26,8 +26,10 @@ import {
   LockerWithdrawal,
   XKDKFinalizedRedeem,
   XKDKRedeem,
+  LPToken,
 } from "./model";
 import { processor, ProcessorContext } from "./processor";
+import { LPS_AS_NFTS } from "./addresses";
 
 type Task = () => Promise<void>;
 type MappingContext = ProcessorContext<StoreWithCache> & { queue: Task[] };
@@ -72,8 +74,6 @@ async function processLog(log: Log, block: any, mctx: MappingContext) {
     await processTreasurySet(log, block, mctx);
   } else if (honeyLockerAbi.events.HoneyLocker__AdapterRegistered.is(log)) {
     await processAdapterRegistered(log, block, mctx);
-  } else if (honeyLockerAbi.events.HoneyLocker__AdapterUpgraded.is(log)) {
-    await processAdapterUpgraded(log, block, mctx);
   } else if (bgtAbi.events.QueueBoost.is(log)) {
     await processBGTQueueBoost(log, mctx);
   } else if (bgtAbi.events.ActivateBoost.is(log)) {
@@ -149,7 +149,7 @@ async function processWithdrawal(log: Log, block: any, mctx: MappingContext) {
       })
     );
   });
-  await updateLockerTotalDeposit(log.address, LPToken, -amountOrId, mctx);
+  await updateLockerTotalDeposit(log.address, LPToken, BigInt(-amountOrId), mctx);
 }
 
 async function processLock(log: Log, mctx: MappingContext) {
@@ -208,7 +208,7 @@ async function processUnstake(log: Log, block: any, mctx: MappingContext) {
     log.address.toLowerCase(),
     LPToken.toLowerCase(),
     vault.toLowerCase(),
-    -amountOrId,
+    BigInt(-amountOrId),
     mctx
   );
 }
@@ -308,27 +308,6 @@ async function processAdapterRegistered(
   });
 }
 
-async function processAdapterUpgraded(
-  log: Log,
-  block: any,
-  mctx: MappingContext
-) {
-  const { protocol, newImplementation } =
-    honeyLockerAbi.events.HoneyLocker__AdapterUpgraded.decode(log);
-  mctx.queue.push(async () => {
-    await mctx.store.upsert(
-      new AdapterUpgraded({
-        id: log.id,
-        locker: log.address.toLowerCase(),
-        protocol: protocol.toLowerCase(),
-        newImplementation: newImplementation.toLowerCase(),
-        timestamp: BigInt(block.header.timestamp),
-        transactionHash: log.transaction?.hash,
-      })
-    );
-  });
-}
-
 async function processBGTQueueBoost(log: Log, mctx: MappingContext) {
   const { sender, validator, amount } = bgtAbi.events.QueueBoost.decode(log);
   const id = `${sender.toLowerCase()}-${validator.toLowerCase()}`;
@@ -403,7 +382,7 @@ async function processBGTCancelBoost(log: Log, mctx: MappingContext) {
 }
 
 async function processOwnershipTransferred(log: Log, mctx: MappingContext) {
-  const { oldOwner, newOwner } =
+  const { previousOwner, newOwner } =
     honeyLockerAbi.events.OwnershipTransferred.decode(log);
   mctx.store.defer(Locker, log.address.toLowerCase());
   mctx.queue.push(async () => {
@@ -552,7 +531,7 @@ async function updateVaultTotalStake(
   lockerAddress: string,
   token: string,
   vault: string,
-  amount: bigint,
+  amountOrId: bigint,
   mctx: MappingContext
 ) {
   const id =
@@ -564,14 +543,54 @@ async function updateVaultTotalStake(
   mctx.store.defer(LockerTotalStake, id);
   mctx.queue.push(async () => {
     const existingStake = await mctx.store.get(LockerTotalStake, id);
-    await mctx.store.upsert(
-      new LockerTotalStake({
-        id,
-        locker: lockerAddress.toLowerCase(),
-        token: token.toLowerCase(),
-        vault: vault.toLowerCase(),
-        amount: (existingStake?.amount || BigInt(0)) + amount,
-      })
-    );
+    
+    // Check if this token is an NFT LP token
+    const isNFT = LPS_AS_NFTS.has(token.toLowerCase());
+
+    if (isNFT) {
+      // Handle NFT LP token
+      let newNftIds = existingStake?.nftIds || [];
+      let newAmount = existingStake?.amount || BigInt(0);
+
+      // If amountOrId is negative, we're removing a stake
+      if (amountOrId < BigInt(0)) {
+        const idToRemove = (-amountOrId).toString();
+        newNftIds = newNftIds.filter(id => id !== idToRemove);
+        // For NFTs, we count each as 1 unit for total amount
+        newAmount = BigInt(newNftIds.length);
+      } else {
+        // If amountOrId is positive, we're adding a stake
+        // Check if the token is already in the list to avoid duplicates
+        const idToAdd = amountOrId.toString();
+        if (!newNftIds.includes(idToAdd)) {
+          newNftIds.push(idToAdd);
+        }
+        // For NFTs, we count each as 1 unit for total amount
+        newAmount = BigInt(newNftIds.length);
+      }
+
+      await mctx.store.upsert(
+        new LockerTotalStake({
+          id,
+          locker: lockerAddress.toLowerCase(),
+          token: token.toLowerCase(),
+          vault: vault.toLowerCase(),
+          amount: newAmount,
+          nftIds: newNftIds,
+        })
+      );
+    } else {
+      // Handle regular ERC20 LP token
+      await mctx.store.upsert(
+        new LockerTotalStake({
+          id,
+          locker: lockerAddress.toLowerCase(),
+          token: token.toLowerCase(),
+          vault: vault.toLowerCase(),
+          amount: (existingStake?.amount || BigInt(0)) + amountOrId,
+          nftIds: existingStake?.nftIds || [],
+        })
+      );
+    }
   });
 }
