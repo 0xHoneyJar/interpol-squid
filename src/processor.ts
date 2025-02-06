@@ -16,12 +16,13 @@ import * as erc20Abi from "./abi/ERC20"; // You'll need to add this ABI
 import { BGT_ADDRESS, FACTORY_ADDRESS, XKDK_ADDRESS } from "./addresses";
 
 export const processor = new EvmBatchProcessor()
-  .setPortal(
-    assertNotNull(
-      process.env.PORTAL_URL,
-      "Required env variable PORTAL_URL is missing"
-    )
-  )
+  // .setPortal(
+  //   assertNotNull(
+  //     process.env.PORTAL_URL,
+  //     "Required env variable PORTAL_URL is missing"
+  //   )
+  // )
+  .setRpcEndpoint("http://57.129.49.205:8545")
   .setFinalityConfirmation(20)
   .setFields({
     transaction: {
@@ -31,7 +32,7 @@ export const processor = new EvmBatchProcessor()
     },
   })
   .setBlockRange({
-    from: 8399404, // deployment block of factory
+    from: 680211
   })
   .addLog({
     address: [FACTORY_ADDRESS], // Factory contract address

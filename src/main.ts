@@ -309,8 +309,8 @@ async function processAdapterRegistered(
 }
 
 async function processBGTQueueBoost(log: Log, mctx: MappingContext) {
-  const { sender, validator, amount } = bgtAbi.events.QueueBoost.decode(log);
-  const id = `${sender.toLowerCase()}-${validator.toLowerCase()}`;
+  const { user, pubkey, amount } = bgtAbi.events.QueueBoost.decode(log);
+  const id = `${user.toLowerCase()}-${pubkey.toLowerCase()}`;
 
   mctx.store.defer(BGTDelegation, id);
   mctx.queue.push(async () => {
@@ -319,8 +319,8 @@ async function processBGTQueueBoost(log: Log, mctx: MappingContext) {
       new BGTDelegation({
         ...existingDelegation,
         id,
-        locker: sender.toLowerCase(),
-        validator: validator.toLowerCase(),
+        locker: user.toLowerCase(),
+        validator: pubkey.toLowerCase(),
         amount,
         state: BGTDelegationState.QUEUED,
         timestamp: BigInt(log.block.timestamp),
@@ -332,8 +332,8 @@ async function processBGTQueueBoost(log: Log, mctx: MappingContext) {
 }
 
 async function processBGTActivateBoost(log: Log, mctx: MappingContext) {
-  const { sender, validator, amount } = bgtAbi.events.ActivateBoost.decode(log);
-  const id = `${sender.toLowerCase()}-${validator.toLowerCase()}`;
+  const { user, pubkey, amount } = bgtAbi.events.ActivateBoost.decode(log);
+  const id = `${user.toLowerCase()}-${pubkey.toLowerCase()}`;
 
   mctx.store.defer(BGTDelegation, id);
   mctx.queue.push(async () => {
@@ -352,8 +352,8 @@ async function processBGTActivateBoost(log: Log, mctx: MappingContext) {
 }
 
 async function processBGTDropBoost(log: Log, mctx: MappingContext) {
-  const { sender, validator, amount } = bgtAbi.events.DropBoost.decode(log);
-  const id = `${sender.toLowerCase()}-${validator.toLowerCase()}`;
+  const { user, pubkey, amount } = bgtAbi.events.DropBoost.decode(log);
+  const id = `${user.toLowerCase()}-${pubkey.toLowerCase()}`;
 
   mctx.store.defer(BGTDelegation, id);
   mctx.queue.push(async () => {
@@ -372,8 +372,8 @@ async function processBGTDropBoost(log: Log, mctx: MappingContext) {
 }
 
 async function processBGTCancelBoost(log: Log, mctx: MappingContext) {
-  const { sender, validator, amount } = bgtAbi.events.CancelBoost.decode(log);
-  const id = `${sender.toLowerCase()}-${validator.toLowerCase()}`;
+  const { user, pubkey, amount } = bgtAbi.events.CancelBoost.decode(log);
+  const id = `${user.toLowerCase()}-${pubkey.toLowerCase()}`;
 
   mctx.store.defer(BGTDelegation, id);
   mctx.queue.push(async () => {

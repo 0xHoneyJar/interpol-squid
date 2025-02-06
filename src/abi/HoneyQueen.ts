@@ -14,7 +14,6 @@ export const functions = {
     adapterBeaconOfProtocol: viewFun("0x2ef5aafb", "adapterBeaconOfProtocol(string)", {"protocol": p.string}, p.address),
     beekeeper: viewFun("0xc5bb4c90", "beekeeper()", {}, p.address),
     computeFees: viewFun("0xbd9124d6", "computeFees(uint256)", {"amount": p.uint256}, p.uint256),
-    getAdapterParams: viewFun("0x7cfc7653", "getAdapterParams(address)", {"vault": p.address}, {"_0": p.address, "_1": p.address}),
     getImplementation: viewFun("0xaaf10f42", "getImplementation()", {}, p.address),
     initialize: fun("0x485cc955", "initialize(address,address)", {"_owner": p.address, "_BGT": p.address}, ),
     isRewardToken: viewFun("0xb5fd73f8", "isRewardToken(address)", {"token": p.address}, p.bool),
@@ -58,10 +57,6 @@ export class Contract extends ContractBase {
 
     computeFees(amount: ComputeFeesParams["amount"]) {
         return this.eth_call(functions.computeFees, {amount})
-    }
-
-    getAdapterParams(vault: GetAdapterParamsParams["vault"]) {
-        return this.eth_call(functions.getAdapterParams, {vault})
     }
 
     getImplementation() {
@@ -129,9 +124,6 @@ export type BeekeeperReturn = FunctionReturn<typeof functions.beekeeper>
 
 export type ComputeFeesParams = FunctionArguments<typeof functions.computeFees>
 export type ComputeFeesReturn = FunctionReturn<typeof functions.computeFees>
-
-export type GetAdapterParamsParams = FunctionArguments<typeof functions.getAdapterParams>
-export type GetAdapterParamsReturn = FunctionReturn<typeof functions.getAdapterParams>
 
 export type GetImplementationParams = FunctionArguments<typeof functions.getImplementation>
 export type GetImplementationReturn = FunctionReturn<typeof functions.getImplementation>

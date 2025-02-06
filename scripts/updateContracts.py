@@ -71,7 +71,7 @@ def updateAddresses():
 
     # Update addresses using regex
     import re
-    content = re.sub(r'(LOCKER_FACTORY_ADDRESS = )"[^"]*"', f'\\1"{factory_addr}"', content)
+    content = re.sub(r'(FACTORY_ADDRESS = )"[^"]*"', f'\\1"{factory_addr}"', content)
     content = re.sub(r'(HONEYQUEEN_ADDRESS = )"[^"]*"', f'\\1"{honeyqueen_addr}"', content)
     # Write updated content
     with open(contracts_file, 'w') as f:
