@@ -22,7 +22,7 @@ export const processor = new EvmBatchProcessor()
   //     "Required env variable PORTAL_URL is missing"
   //   )
   // )
-  .setRpcEndpoint("http://57.129.49.205:8545")
+  .setRpcEndpoint(process.env.RPC_BERACHAIN_HTTP)
   .setFinalityConfirmation(20)
   .setFields({
     transaction: {
@@ -62,6 +62,7 @@ export const processor = new EvmBatchProcessor()
       bgtAbi.events.CancelBoost.topic,
       bgtAbi.events.DropBoost.topic,
     ],
+    transaction: true,
   })
   .addLog({
     address: [XKDK_ADDRESS],

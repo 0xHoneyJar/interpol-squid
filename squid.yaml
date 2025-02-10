@@ -5,7 +5,7 @@ description: "Interpol Mainnet v2 Squid"
 build:
 deploy:
   env:
-    PORTAL_URL: ${{ addons.portal.berachain_bartio.http }}
+    RPC_BERACHAIN_HTTP: ${{ secrets.RPC_BERACHAIN_HTTP }}
   addons:
     postgres:
     # rpc:
