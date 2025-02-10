@@ -56,13 +56,13 @@ export async function processBGTEvent(
         break;
     }
 
-    await mctx.store.upsert(
+    await mctx.store.insert(
       new BGTBoostAction({
         id: boostActionId,
         locker: user.toLowerCase(),
         validator: pubkey.toLowerCase(),
         amount,
-        action: BGTBoostActionType.BOOST_ACTIVATED,
+        action,
         timestamp: BigInt(log.block.timestamp),
         transactionHash: log.transaction?.hash || "",
       })
