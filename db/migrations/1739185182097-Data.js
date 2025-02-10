@@ -1,5 +1,5 @@
-module.exports = class Data1738849820179 {
-    name = 'Data1738849820179'
+module.exports = class Data1739185182097 {
+    name = 'Data1739185182097'
 
     async up(db) {
         await db.query(`CREATE TABLE "locker" ("id" character varying NOT NULL, "owner" text NOT NULL, "treasury" text, "operator" text, "timestamp" numeric NOT NULL, "address" text NOT NULL, "unlocked" boolean NOT NULL, "referrer" text NOT NULL, CONSTRAINT "PK_295c0898cceea20ac8ee103d98d" PRIMARY KEY ("id"))`)
@@ -31,11 +31,11 @@ module.exports = class Data1738849820179 {
         await db.query(`CREATE INDEX "IDX_b66557c44bcf1a33c6071b2f08" ON "locker_wildcard" ("vault") `)
         await db.query(`CREATE TABLE "adapter_registered" ("id" character varying NOT NULL, "locker" text NOT NULL, "protocol" text NOT NULL, "adapter" text NOT NULL, "timestamp" numeric NOT NULL, "transaction_hash" text NOT NULL, CONSTRAINT "PK_84c2d301f6e17b440398a4aff3e" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_decc1886f207b1c1e5f46192f5" ON "adapter_registered" ("locker") `)
-        await db.query(`CREATE TABLE "adapter_upgraded" ("id" character varying NOT NULL, "locker" text NOT NULL, "protocol" text NOT NULL, "new_implementation" text NOT NULL, "timestamp" numeric NOT NULL, "transaction_hash" text NOT NULL, CONSTRAINT "PK_80ba6d3e43b350831ea841fc8e3" PRIMARY KEY ("id"))`)
-        await db.query(`CREATE INDEX "IDX_41c57170de73343b6243e2c792" ON "adapter_upgraded" ("locker") `)
+        await db.query(`CREATE TABLE "bgt_final_boost_status" ("id" character varying NOT NULL, "locker" text NOT NULL, "validator" text NOT NULL, "queued_boost_amount" numeric NOT NULL, "activated_boost_amount" numeric NOT NULL, "queued_drop_amount" numeric NOT NULL, CONSTRAINT "PK_9e84063e65335dce906c98a2c9a" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_b510a8ef4089a37c84d95cb9cf" ON "bgt_final_boost_status" ("locker") `)
+        await db.query(`CREATE TABLE "bgt_boost_action" ("id" character varying NOT NULL, "locker" text NOT NULL, "validator" text NOT NULL, "amount" numeric NOT NULL, "action" character varying(26) NOT NULL, "timestamp" numeric NOT NULL, "transaction_hash" text NOT NULL, CONSTRAINT "PK_21a571d8ec58ea93b626a52f147" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_b5ad1a0f223cd3c575c6934a74" ON "bgt_boost_action" ("locker") `)
         await db.query(`CREATE TABLE "fees" ("id" character varying NOT NULL, "referral" text NOT NULL, "token" text NOT NULL, "amount" numeric NOT NULL, "transaction_hash" text NOT NULL, "timestamp" numeric NOT NULL, CONSTRAINT "PK_97f3a1b1b8ee5674fd4da93f461" PRIMARY KEY ("id"))`)
-        await db.query(`CREATE TABLE "bgt_delegation" ("id" character varying NOT NULL, "locker" text NOT NULL, "validator" text NOT NULL, "amount" numeric NOT NULL, "state" character varying(9) NOT NULL, "timestamp" numeric NOT NULL, "queued_at_block" integer NOT NULL, "transaction_hash" text NOT NULL, CONSTRAINT "PK_1df066562fa706e41ff490333ed" PRIMARY KEY ("id"))`)
-        await db.query(`CREATE INDEX "IDX_e62381f49a5d42797789ad4bcc" ON "bgt_delegation" ("locker") `)
         await db.query(`CREATE TABLE "xkdk_finalized_redeem" ("id" character varying NOT NULL, "locker" text NOT NULL, "amount" numeric NOT NULL, "timestamp" numeric NOT NULL, "transaction_hash" text NOT NULL, CONSTRAINT "PK_80cb2645ef932a9eb6a5fad3536" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_80359b1caddb97a68866fbfa95" ON "xkdk_finalized_redeem" ("locker") `)
         await db.query(`CREATE TABLE "xkdk_redeem" ("id" character varying NOT NULL, "locker" text NOT NULL, "x_kodiak_amount" numeric NOT NULL, "kodiak_amount" numeric NOT NULL, "duration" numeric NOT NULL, "timestamp" numeric NOT NULL, "transaction_hash" text NOT NULL, CONSTRAINT "PK_b1e6b980d5ac11f91dc9043001d" PRIMARY KEY ("id"))`)
@@ -75,11 +75,11 @@ module.exports = class Data1738849820179 {
         await db.query(`DROP INDEX "public"."IDX_b66557c44bcf1a33c6071b2f08"`)
         await db.query(`DROP TABLE "adapter_registered"`)
         await db.query(`DROP INDEX "public"."IDX_decc1886f207b1c1e5f46192f5"`)
-        await db.query(`DROP TABLE "adapter_upgraded"`)
-        await db.query(`DROP INDEX "public"."IDX_41c57170de73343b6243e2c792"`)
+        await db.query(`DROP TABLE "bgt_final_boost_status"`)
+        await db.query(`DROP INDEX "public"."IDX_b510a8ef4089a37c84d95cb9cf"`)
+        await db.query(`DROP TABLE "bgt_boost_action"`)
+        await db.query(`DROP INDEX "public"."IDX_b5ad1a0f223cd3c575c6934a74"`)
         await db.query(`DROP TABLE "fees"`)
-        await db.query(`DROP TABLE "bgt_delegation"`)
-        await db.query(`DROP INDEX "public"."IDX_e62381f49a5d42797789ad4bcc"`)
         await db.query(`DROP TABLE "xkdk_finalized_redeem"`)
         await db.query(`DROP INDEX "public"."IDX_80359b1caddb97a68866fbfa95"`)
         await db.query(`DROP TABLE "xkdk_redeem"`)

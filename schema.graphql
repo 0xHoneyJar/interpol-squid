@@ -120,11 +120,35 @@ type AdapterRegistered @entity {
   transactionHash: String!
 }
 
-type AdapterUpgraded @entity {
+# ----------------------------------------------------
+#                     Misc
+# ----------------------------------------------------
+
+# Final boost status for a validator
+type BGTFinalBoostStatus @entity {
   id: ID!
   locker: String! @index
-  protocol: String!
-  newImplementation: String!
+  validator: String!
+  queuedBoostAmount: BigInt!
+  activatedBoostAmount: BigInt!
+  queuedDropAmount: BigInt!
+}
+
+enum BGTBoostActionType {
+  BOOST_QUEUED
+  CANCELED_BOOST_QUEUED
+  BOOST_ACTIVATED
+  DROP_BOOST_QUEUED
+  DROP_BOOST
+  CANCELED_DROP_BOOST_QUEUED
+}
+
+type BGTBoostAction @entity {
+  id: ID!
+  locker: String! @index
+  validator: String!
+  amount: BigInt!
+  action: BGTBoostActionType!
   timestamp: BigInt!
   transactionHash: String!
 }
@@ -140,23 +164,6 @@ type Fees @entity {
   amount: BigInt!
   transactionHash: String!
   timestamp: BigInt!
-}
-
-enum BGTDelegationState {
-  QUEUED
-  ACTIVATED
-  DROPPED
-}
-
-type BGTDelegation @entity {
-  id: ID!
-  locker: String! @index
-  validator: String!
-  amount: BigInt!
-  state: BGTDelegationState!
-  timestamp: BigInt!
-  queuedAtBlock: Int!
-  transactionHash: String!
 }
 
 type XKDKFinalizedRedeem @entity {

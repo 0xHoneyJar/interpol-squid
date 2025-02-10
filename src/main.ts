@@ -1,5 +1,4 @@
 import {
-  StoreWithCache,
   TypeormDatabaseWithCache,
 } from "@belopash/typeorm-store";
 import { Log } from "@subsquid/evm-processor";
@@ -11,9 +10,6 @@ import * as xkdkAbi from "./abi/XKDK";
 import {
   Adapter,
   AdapterRegistered,
-  AdapterUpgraded,
-  BGTDelegation,
-  BGTDelegationState,
   Locker,
   LockerBalance,
   LockerDeposit,
@@ -26,13 +22,15 @@ import {
   LockerWithdrawal,
   XKDKFinalizedRedeem,
   XKDKRedeem,
+  BGTBoostActionType,
   LPToken,
 } from "./model";
-import { processor, ProcessorContext } from "./processor";
+import { processor } from "./processor";
 import { LPS_AS_NFTS } from "./addresses";
-
-type Task = () => Promise<void>;
-type MappingContext = ProcessorContext<StoreWithCache> & { queue: Task[] };
+import { MappingContext } from "./types";
+import {
+  processBGTEvent
+} from "./handlers/bgt";
 
 processor.run(new TypeormDatabaseWithCache(), async (ctx) => {
   const mctx: MappingContext = {
@@ -75,13 +73,17 @@ async function processLog(log: Log, block: any, mctx: MappingContext) {
   } else if (honeyLockerAbi.events.HoneyLocker__AdapterRegistered.is(log)) {
     await processAdapterRegistered(log, block, mctx);
   } else if (bgtAbi.events.QueueBoost.is(log)) {
-    await processBGTQueueBoost(log, mctx);
+    await processBGTEvent(log, mctx, BGTBoostActionType.BOOST_QUEUED, "QueueBoost");
   } else if (bgtAbi.events.ActivateBoost.is(log)) {
-    await processBGTActivateBoost(log, mctx);
-  } else if (bgtAbi.events.CancelBoost.is(log)) {
-    await processBGTCancelBoost(log, mctx);
+    await processBGTEvent(log, mctx, BGTBoostActionType.BOOST_ACTIVATED, "ActivateBoost");
+  } else if (bgtAbi.events.QueueDropBoost.is(log)) {
+    await processBGTEvent(log, mctx, BGTBoostActionType.DROP_BOOST_QUEUED, "QueueDropBoost");
   } else if (bgtAbi.events.DropBoost.is(log)) {
-    await processBGTDropBoost(log, mctx);
+    await processBGTEvent(log, mctx, BGTBoostActionType.DROP_BOOST, "DropBoost");
+  } else if (bgtAbi.events.CancelBoost.is(log)) {
+    await processBGTEvent(log, mctx, BGTBoostActionType.CANCELED_BOOST_QUEUED, "CancelBoost");
+  } else if (bgtAbi.events.CancelDropBoost.is(log)) {
+    await processBGTEvent(log, mctx, BGTBoostActionType.CANCELED_DROP_BOOST_QUEUED, "CancelDropBoost");
   } else if (xkdkAbi.events.Redeem.is(log)) {
     await processXKDKRedeem(log, block, mctx);
   } else if (xkdkAbi.events.FinalizeRedeem.is(log)) {
@@ -305,79 +307,6 @@ async function processAdapterRegistered(
         locker: log.address.toLowerCase(),
       })
     );
-  });
-}
-
-async function processBGTQueueBoost(log: Log, mctx: MappingContext) {
-  const { user, pubkey, amount } = bgtAbi.events.QueueBoost.decode(log);
-  const id = `${user.toLowerCase()}-${pubkey.toLowerCase()}`;
-
-  mctx.store.defer(BGTDelegation, id);
-  mctx.queue.push(async () => {
-    const existingDelegation = await mctx.store.get(BGTDelegation, id);
-    await mctx.store.upsert(
-      new BGTDelegation({
-        ...existingDelegation,
-        id,
-        locker: user.toLowerCase(),
-        validator: pubkey.toLowerCase(),
-        amount,
-        state: BGTDelegationState.QUEUED,
-        timestamp: BigInt(log.block.timestamp),
-        queuedAtBlock: log.block.height,
-        transactionHash: log.transaction?.hash || "",
-      })
-    );
-  });
-}
-
-async function processBGTActivateBoost(log: Log, mctx: MappingContext) {
-  const { user, pubkey, amount } = bgtAbi.events.ActivateBoost.decode(log);
-  const id = `${user.toLowerCase()}-${pubkey.toLowerCase()}`;
-
-  mctx.store.defer(BGTDelegation, id);
-  mctx.queue.push(async () => {
-    const existingDelegation = await mctx.store.get(BGTDelegation, id);
-    if (!existingDelegation) return; // Guard clause for safety
-
-    await mctx.store.upsert(
-      new BGTDelegation({
-        ...existingDelegation,
-        state: BGTDelegationState.ACTIVATED,
-        timestamp: BigInt(log.block.timestamp),
-        transactionHash: log.transaction?.hash || "",
-      })
-    );
-  });
-}
-
-async function processBGTDropBoost(log: Log, mctx: MappingContext) {
-  const { user, pubkey, amount } = bgtAbi.events.DropBoost.decode(log);
-  const id = `${user.toLowerCase()}-${pubkey.toLowerCase()}`;
-
-  mctx.store.defer(BGTDelegation, id);
-  mctx.queue.push(async () => {
-    const existingDelegation = await mctx.store.get(BGTDelegation, id);
-    if (!existingDelegation) return; // Guard clause for safety
-
-    await mctx.store.upsert(
-      new BGTDelegation({
-        ...existingDelegation,
-        state: BGTDelegationState.DROPPED,
-        timestamp: BigInt(log.block.timestamp),
-        transactionHash: log.transaction?.hash || "",
-      })
-    );
-  });
-}
-
-async function processBGTCancelBoost(log: Log, mctx: MappingContext) {
-  const { user, pubkey, amount } = bgtAbi.events.CancelBoost.decode(log);
-  const id = `${user.toLowerCase()}-${pubkey.toLowerCase()}`;
-
-  mctx.store.defer(BGTDelegation, id);
-  mctx.queue.push(async () => {
-    await mctx.store.remove(BGTDelegation, id);
   });
 }
 

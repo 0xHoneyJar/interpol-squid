@@ -1,8 +1,9 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, StringColumn as StringColumn_, Index as Index_, BigIntColumn as BigIntColumn_} from "@subsquid/typeorm-store"
+import {BGTBoostActionType} from "./_bgtBoostActionType"
 
 @Entity_()
-export class AdapterUpgraded {
-    constructor(props?: Partial<AdapterUpgraded>) {
+export class BGTBoostAction {
+    constructor(props?: Partial<BGTBoostAction>) {
         Object.assign(this, props)
     }
 
@@ -14,10 +15,13 @@ export class AdapterUpgraded {
     locker!: string
 
     @StringColumn_({nullable: false})
-    protocol!: string
+    validator!: string
 
-    @StringColumn_({nullable: false})
-    newImplementation!: string
+    @BigIntColumn_({nullable: false})
+    amount!: bigint
+
+    @Column_("varchar", {length: 26, nullable: false})
+    action!: BGTBoostActionType
 
     @BigIntColumn_({nullable: false})
     timestamp!: bigint
