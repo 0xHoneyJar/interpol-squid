@@ -6,7 +6,6 @@ import {
   Log as _Log,
   Transaction as _Transaction,
 } from "@subsquid/evm-processor";
-import { assertNotNull } from "@subsquid/util-internal";
 import * as bgtAbi from "./abi/BGT"; // You'll need to add this ABI
 import * as honeyLockerAbi from "./abi/HoneyLocker";
 import * as lockerFactoryAbi from "./abi/LockerFactory";
@@ -22,6 +21,7 @@ export const processor = new EvmBatchProcessor()
   //     "Required env variable PORTAL_URL is missing"
   //   )
   // )
+  .setGateway("https://v2.archive.subsquid.io/network/berachain-mainnet")
   .setRpcEndpoint(process.env.RPC_BERACHAIN_HTTP)
   .setFinalityConfirmation(20)
   .setFields({
@@ -32,7 +32,7 @@ export const processor = new EvmBatchProcessor()
     },
   })
   .setBlockRange({
-    from: 680211
+    from: 680211,
   })
   .addLog({
     address: [FACTORY_ADDRESS], // Factory contract address

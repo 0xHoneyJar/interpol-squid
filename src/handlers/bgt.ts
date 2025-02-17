@@ -1,17 +1,23 @@
-import { Log } from "../processor";
-import { MappingContext } from "../types";
+import * as bgtAbi from "../abi/BGT";
 import {
-  BGTBoostActionType,
   BGTBoostAction,
+  BGTBoostActionType,
   BGTFinalBoostStatus,
 } from "../model";
-import * as bgtAbi from "../abi/BGT";
+import { Log } from "../processor";
+import { MappingContext } from "../types";
 
 export async function processBGTEvent(
   log: Log,
   mctx: MappingContext,
   action: BGTBoostActionType,
-  event: "ActivateBoost" | "QueueBoost" | "DropBoost" | "QueueDropBoost" | "CancelBoost" | "CancelDropBoost"
+  event:
+    | "ActivateBoost"
+    | "QueueBoost"
+    | "DropBoost"
+    | "QueueDropBoost"
+    | "CancelBoost"
+    | "CancelDropBoost"
 ) {
   const { user, pubkey, amount } = bgtAbi.events[event].decode(log);
   const boostActionId = `${user.toLowerCase()}-${pubkey.toLowerCase()}-${
@@ -65,6 +71,7 @@ export async function processBGTEvent(
         action,
         timestamp: BigInt(log.block.timestamp),
         transactionHash: log.transaction?.hash || "",
+        blockNumber: BigInt(log.block.height),
       })
     );
 

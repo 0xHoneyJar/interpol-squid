@@ -151,6 +151,7 @@ type BGTBoostAction @entity {
   action: BGTBoostActionType!
   timestamp: BigInt!
   transactionHash: String!
+  blockNumber: BigInt!
 }
 
 # ----------------------------------------------------

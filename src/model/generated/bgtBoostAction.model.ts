@@ -28,4 +28,7 @@ export class BGTBoostAction {
 
     @StringColumn_({nullable: false})
     transactionHash!: string
+
+    @BigIntColumn_({nullable: false})
+    blockNumber!: bigint
 }
