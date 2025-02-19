@@ -128,10 +128,12 @@ type AdapterRegistered @entity {
 type BGTFinalBoostStatus @entity {
   id: ID!
   locker: String! @index
-  validator: String!
+  validator: String! @index
   queuedBoostAmount: BigInt!
   activatedBoostAmount: BigInt!
   queuedDropAmount: BigInt!
+  lastUpdateBlock: BigInt!
+  lastQueueBlock: BigInt
 }
 
 enum BGTBoostActionType {

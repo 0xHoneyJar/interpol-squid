@@ -38,10 +38,12 @@ export async function processBGTEvent(
       existingFinalBoostStatus?.activatedBoostAmount ?? BigInt(0);
     let newQueuedDropAmount =
       existingFinalBoostStatus?.queuedDropAmount ?? BigInt(0);
+    let lastQueueBlock = existingFinalBoostStatus?.lastQueueBlock ?? BigInt(0);
 
     switch (action) {
       case BGTBoostActionType.BOOST_QUEUED:
         newQueuedBoostAmount += amount;
+        lastQueueBlock = BigInt(log.block.height);
         break;
       case BGTBoostActionType.BOOST_ACTIVATED:
         newActivatedBoostAmount += amount;
@@ -50,6 +52,7 @@ export async function processBGTEvent(
       case BGTBoostActionType.DROP_BOOST_QUEUED:
         newQueuedDropAmount += amount;
         newActivatedBoostAmount -= amount;
+        lastQueueBlock = BigInt(log.block.height);
         break;
       case BGTBoostActionType.DROP_BOOST:
         newQueuedDropAmount -= amount;
@@ -83,6 +86,8 @@ export async function processBGTEvent(
         queuedBoostAmount: newQueuedBoostAmount,
         activatedBoostAmount: newActivatedBoostAmount,
         queuedDropAmount: newQueuedDropAmount,
+        lastUpdateBlock: BigInt(log.block.height),
+        lastQueueBlock: lastQueueBlock,
       })
     );
   });

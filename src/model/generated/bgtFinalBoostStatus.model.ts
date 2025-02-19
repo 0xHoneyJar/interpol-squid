@@ -13,6 +13,7 @@ export class BGTFinalBoostStatus {
     @StringColumn_({nullable: false})
     locker!: string
 
+    @Index_()
     @StringColumn_({nullable: false})
     validator!: string
 
@@ -24,4 +25,10 @@ export class BGTFinalBoostStatus {
 
     @BigIntColumn_({nullable: false})
     queuedDropAmount!: bigint
+
+    @BigIntColumn_({nullable: false})
+    lastUpdateBlock!: bigint
+
+    @BigIntColumn_({nullable: true})
+    lastQueueBlock!: bigint | undefined | null
 }
