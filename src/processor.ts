@@ -61,6 +61,8 @@ export const processor = new EvmBatchProcessor()
       bgtAbi.events.QueueBoost.topic,
       bgtAbi.events.CancelBoost.topic,
       bgtAbi.events.DropBoost.topic,
+      bgtAbi.events.QueueDropBoost.topic,
+      bgtAbi.events.CancelDropBoost.topic,
     ],
     transaction: true,
   })
