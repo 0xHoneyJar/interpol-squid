@@ -1,12 +1,13 @@
 manifestVersion: subsquid.io/v0.1
 name: interpol-mainnet-v2
-version: 5
+version: 6
 description: "Interpol Mainnet v2 Squid"
 build:
 deploy:
   env:
     RPC_BERACHAIN_HTTP: ${{ secrets.RPC_BERACHAIN_HTTP }}
     RPC_BERACHAIN_TESTNET_HTTP: ${{ secrets.RPC_BERACHAIN_TESTNET_HTTP }}
+    API_KEY: ${{ secrets.API_KEY }}
   addons:
     postgres:
     # rpc:
