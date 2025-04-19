@@ -1,15 +1,16 @@
-import {
-  TypeormDatabaseWithCache,
-} from "@belopash/typeorm-store";
+import { TypeormDatabaseWithCache } from "@belopash/typeorm-store";
 import { Log } from "@subsquid/evm-processor";
 import * as bgtAbi from "./abi/BGT";
 import * as erc20Abi from "./abi/ERC20";
 import * as honeyLockerAbi from "./abi/HoneyLocker";
 import * as lockerFactoryAbi from "./abi/LockerFactory";
 import * as xkdkAbi from "./abi/XKDK";
+import { LPS_AS_NFTS } from "./addresses";
+import { processBGTEvent } from "./handlers/bgt";
 import {
   Adapter,
   AdapterRegistered,
+  BGTBoostActionType,
   Locker,
   LockerBalance,
   LockerDeposit,
@@ -22,15 +23,9 @@ import {
   LockerWithdrawal,
   XKDKFinalizedRedeem,
   XKDKRedeem,
-  BGTBoostActionType,
-  LPToken,
 } from "./model";
 import { processor } from "./processor";
-import { LPS_AS_NFTS } from "./addresses";
 import { MappingContext } from "./types";
-import {
-  processBGTEvent
-} from "./handlers/bgt";
 
 processor.run(new TypeormDatabaseWithCache(), async (ctx) => {
   const mctx: MappingContext = {
@@ -73,17 +68,47 @@ async function processLog(log: Log, block: any, mctx: MappingContext) {
   } else if (honeyLockerAbi.events.HoneyLocker__AdapterRegistered.is(log)) {
     await processAdapterRegistered(log, block, mctx);
   } else if (bgtAbi.events.QueueBoost.is(log)) {
-    await processBGTEvent(log, mctx, BGTBoostActionType.BOOST_QUEUED, "QueueBoost");
+    await processBGTEvent(
+      log,
+      mctx,
+      BGTBoostActionType.BOOST_QUEUED,
+      "QueueBoost"
+    );
   } else if (bgtAbi.events.ActivateBoost.is(log)) {
-    await processBGTEvent(log, mctx, BGTBoostActionType.BOOST_ACTIVATED, "ActivateBoost");
+    await processBGTEvent(
+      log,
+      mctx,
+      BGTBoostActionType.BOOST_ACTIVATED,
+      "ActivateBoost"
+    );
   } else if (bgtAbi.events.QueueDropBoost.is(log)) {
-    await processBGTEvent(log, mctx, BGTBoostActionType.DROP_BOOST_QUEUED, "QueueDropBoost");
+    await processBGTEvent(
+      log,
+      mctx,
+      BGTBoostActionType.DROP_BOOST_QUEUED,
+      "QueueDropBoost"
+    );
   } else if (bgtAbi.events.DropBoost.is(log)) {
-    await processBGTEvent(log, mctx, BGTBoostActionType.DROP_BOOST, "DropBoost");
+    await processBGTEvent(
+      log,
+      mctx,
+      BGTBoostActionType.DROP_BOOST,
+      "DropBoost"
+    );
   } else if (bgtAbi.events.CancelBoost.is(log)) {
-    await processBGTEvent(log, mctx, BGTBoostActionType.CANCELED_BOOST_QUEUED, "CancelBoost");
+    await processBGTEvent(
+      log,
+      mctx,
+      BGTBoostActionType.CANCELED_BOOST_QUEUED,
+      "CancelBoost"
+    );
   } else if (bgtAbi.events.CancelDropBoost.is(log)) {
-    await processBGTEvent(log, mctx, BGTBoostActionType.CANCELED_DROP_BOOST_QUEUED, "CancelDropBoost");
+    await processBGTEvent(
+      log,
+      mctx,
+      BGTBoostActionType.CANCELED_DROP_BOOST_QUEUED,
+      "CancelDropBoost"
+    );
   } else if (xkdkAbi.events.Redeem.is(log)) {
     await processXKDKRedeem(log, block, mctx);
   } else if (xkdkAbi.events.FinalizeRedeem.is(log)) {
@@ -151,7 +176,12 @@ async function processWithdrawal(log: Log, block: any, mctx: MappingContext) {
       })
     );
   });
-  await updateLockerTotalDeposit(log.address, LPToken, BigInt(-amountOrId), mctx);
+  await updateLockerTotalDeposit(
+    log.address,
+    LPToken,
+    BigInt(-amountOrId),
+    mctx
+  );
 }
 
 async function processLock(log: Log, mctx: MappingContext) {
@@ -384,11 +414,21 @@ async function processERC20Transfer(
 ) {
   const { from, to, value } = erc20Abi.events.Transfer.decode(log);
 
+  // Defer both entities at once
   mctx.store.defer(Locker, to.toLowerCase());
   mctx.store.defer(Locker, from.toLowerCase());
 
+  // Use a single queue operation to handle both sides of the transfer
+  // This ensures atomicity and prevents race conditions
   mctx.queue.push(async () => {
     const isToVault = await mctx.store.get(Locker, to.toLowerCase());
+    const isFromVault = await mctx.store.get(Locker, from.toLowerCase());
+
+    // Log the transfer details for debugging
+    console.log(
+      `ERC20 Transfer: ${from} -> ${to}, Token: ${log.address}, Value: ${value}`
+    );
+
     if (isToVault) {
       await updateVaultBalance(
         to.toLowerCase(),
@@ -397,10 +437,7 @@ async function processERC20Transfer(
         mctx
       );
     }
-  });
 
-  mctx.queue.push(async () => {
-    const isFromVault = await mctx.store.get(Locker, from.toLowerCase());
     if (isFromVault) {
       await updateVaultBalance(
         from.toLowerCase(),
@@ -422,13 +459,21 @@ async function updateVaultBalance(
   mctx.store.defer(LockerBalance, id);
   mctx.queue.push(async () => {
     const existingBalance = await mctx.store.get(LockerBalance, id);
+    const newBalance = (existingBalance?.balance || 0n) + amount;
+
+    // Log balance updates for debugging
+    console.log(
+      `Updating balance for ${id}: ${
+        existingBalance?.balance || 0n
+      } + ${amount} = ${newBalance}`
+    );
 
     await mctx.store.upsert(
       new LockerBalance({
         id,
         locker: lockerAddress.toLowerCase(),
         token: tokenAddress.toLowerCase(),
-        balance: (existingBalance?.balance || 0n) + amount,
+        balance: newBalance,
       })
     );
   });
@@ -472,7 +517,7 @@ async function updateVaultTotalStake(
   mctx.store.defer(LockerTotalStake, id);
   mctx.queue.push(async () => {
     const existingStake = await mctx.store.get(LockerTotalStake, id);
-    
+
     // Check if this token is an NFT LP token
     const isNFT = LPS_AS_NFTS.has(token.toLowerCase());
 
@@ -484,7 +529,7 @@ async function updateVaultTotalStake(
       // If amountOrId is negative, we're removing a stake
       if (amountOrId < BigInt(0)) {
         const idToRemove = (-amountOrId).toString();
-        newNftIds = newNftIds.filter(id => id !== idToRemove);
+        newNftIds = newNftIds.filter((id) => id !== idToRemove);
         // For NFTs, we count each as 1 unit for total amount
         newAmount = BigInt(newNftIds.length);
       } else {
